@@ -23,8 +23,8 @@ nbonds = 1372
 z = nbonds / natoms
 k = 2.5
 iter_num = itertools.count()
-# Prunung  the network until some kind of condition is met.
-print("#Prunung  the network until some kind of condition is met.")
+# Pruning the network until some kind of condition is met.
+print("#Pruning the network until some kind of condition is met.")
 while z >= k:
 
     print("===========Obtaining G0=============")
