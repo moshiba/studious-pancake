@@ -15,7 +15,7 @@ with open("data.file", "r") as f:
         if i == 4:
             nbonds = int(line[i].split(" ")[0])
             break
-f.close()
+
 # for loading
 nbonds = 1372
 
@@ -54,7 +54,7 @@ while z >= k:
         for i in range(len(store_MG)):
             total_G += store_MG[i]
         G0 = total_G / len(store_MG)
-    f.close()
+
     print("Initial G0 aqqired:", G0)
 
     # store initial bonds in each main iteration
@@ -68,7 +68,6 @@ while z >= k:
     #               bflag = True
     #            if bflag == True:
     #                store_bond.append(line)
-    #    f.close()
     #    print("Storing initail bonds complete.")
 
     #    nbonds = len(store_bond)
@@ -113,7 +112,6 @@ while z >= k:
                     if Sflag:
                         store = line.split(" ")[1]
                         store_MG.append(float(store[:-1]))
-            f.close()
 
             total_G = 0
             for m in range(len(store_MG)):
@@ -148,7 +146,7 @@ while z >= k:
                 store = line.split(" ")[1]
                 store_MV.append(float(store[:-1]))
 
-    f.close()
+
     total_V = 0
     for m in range(len(store_MV)):
         total_V += store_MV[m]
@@ -166,13 +164,13 @@ while z >= k:
             if i == 4:
                 b = int(lines[i].split(" ")[0])
                 break
-    f.close()
+
     z = b / a
 
     with open("./checkpoint/data_v{}_z{}.file".format(V, z), "w+") as f:
         for line in lines:
             f.write(line)
-    f.close()
+
 
     print("Data saved at ./checkpoint")
     # copydata then save data in another folder
