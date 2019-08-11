@@ -5,16 +5,16 @@ import os
 import math
 
 # Aquire some initial condition Z K
-print("Aquiring some initial condition eg.Z and K")
+print("Aquiring some initial condition eg. Z and K")
 with open("data.file", "r") as f:
-    line = f.readlines()
+    f.readline()
+    f.readline()
+    natoms = int(f.readline().split()[0])
+    f.readline()
+    nbonds = int(f.readline().split()[0])
+print(f"natoms: {natoms}")
+print(f"nbonds: {nbonds}")
 
-    for i in range(len(line)):
-        if i == 2:
-            natoms = int(line[i].split(" ")[0])
-        if i == 4:
-            nbonds = int(line[i].split(" ")[0])
-            break
 
 # for loading
 nbonds = 1372
