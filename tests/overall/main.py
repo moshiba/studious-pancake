@@ -3,6 +3,7 @@ from lammps import lammps
 
 import os
 import math
+import itertools
 
 # Aquire some initial condition Z K
 print("Aquiring some initial condition eg. Z and K")
@@ -21,7 +22,7 @@ nbonds = 1372
 
 z = nbonds / natoms
 k = 2.5
-i_iter = 0
+iter_num = itertools.count()
 # Prunung  the network until some kind of condition is met.
 print("#Prunung  the network until some kind of condition is met.")
 while z >= k:
@@ -33,8 +34,8 @@ while z >= k:
     lmp.close()
     print("===========G0 test is completed=============")
 
-    i_iter += 1
-    print("Number of iteration: ", i_iter)
+    next(iter_num)
+    print("Number of iteration: ", iter_num)
     with open("ShearModulusG.t", "r") as f:  # ShearModulusG.t= G0
         store_MG = []
         line = f.readline()
