@@ -44,6 +44,8 @@ while z >= k:
 
     print("Initial G0 aqqired:", G0)
 
+    # @todo LEGACY CODE
+    # @body rewrite or cleanup
     # store initial bonds in each main iteration
     #    print("Storing initail bonds...")
     #    with open("data.file", "r") as f:
