@@ -4,6 +4,7 @@ from lammps import lammps
 import os
 import math
 import itertools
+import statistics
 
 # Aquire some initial condition Z K
 print("Aquiring some initial condition eg. Z and K")
@@ -37,24 +38,9 @@ while z >= k:
     next(iter_num)
     print("Number of iteration: ", iter_num)
     with open("ShearModulusG.t", "r") as f:  # ShearModulusG.t= G0
-        store_MG = []
-        line = f.readline()
-        Sflag = False
-        # BEFORE THIS LINE: read network info
-        # AFTER THIS LINE: screen for some filter to continue loop
-        while line:
-            line = f.readline()
-            if line.split(" ")[0] == "20000":
-                Sflag = True
-            if line.split(" ")[0] == "100000":
-                Sflag = False
-            if Sflag:
-                store = line.split(" ")[1]
-                store_MG.append(float(store[:-1]))
-        total_G = 0
-        for i in range(len(store_MG)):
-            total_G += store_MG[i]
-        G0 = total_G / len(store_MG)
+        lines = f.readlines()[20000:100000]
+        MG_list = list(map((lambda x: x.split(' ')[1]), lines))
+        G0 = statistics.mean(MG_list)
 
     print("Initial G0 aqqired:", G0)
 
