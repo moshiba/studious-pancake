@@ -8,20 +8,15 @@ import statistics
 
 # Aquire some initial condition Z K
 print("Aquiring some initial condition eg. Z and K")
-with open("data.file", "r") as f:
-    f.readline()
-    f.readline()
-    natoms = int(f.readline().split()[0])
-    f.readline()
-    nbonds = int(f.readline().split()[0])
-print(f"natoms: {natoms}")
-print(f"nbonds: {nbonds}")
+datafile = utils.fileio.datafile("data.file")
+print(f"natoms: {datafile.natoms}")
+print(f"nbonds: {datafile.nbonds}")
 
 
 # for loading
 nbonds = 1372
 
-z = nbonds / natoms
+z = datafile.nbonds / datafile.natoms
 k = 2.5
 iter_num = itertools.count()
 
@@ -78,9 +73,9 @@ while z >= k:
     deltaG = []
     #    print("nmber of bonds =",b)
     print("Deleting bonds...")
-    for idx in range(nbonds):
+    for idx in range(datafile.nbonds):
         try:
-            temdeleted = utils.fileio.deleteBond(idx + 1)
+            temdeleted = datafile.deleteBond(idx + 1)
             print("tem =", temdeleted)
         except utils.fileio.datafile.BoundNotFoundError:
             # Already deleted
@@ -114,22 +109,14 @@ while z >= k:
     if not os.path.isdir('./checkpoint'):
         os.mkdir('./checkpoint')
 
-    with open("data.file", "r") as f:
-        lines = f.readlines()
-        for i in range(len(lines)):
-            if i == 2:
-                a = int(lines[i].split(" ")[0])
-            if i == 4:
-                b = int(lines[i].split(" ")[0])
-                break
+    z = datafile.nbonds / datafile.natoms
 
-    z = b / a
+    # @todo check with designer to see if we need checkpoints
+    # with open("./checkpoint/data_v{}_z{}.file".format(V, z), "w+") as f:
+    #     for line in lines:
+    #         f.write(line)
 
-    with open("./checkpoint/data_v{}_z{}.file".format(V, z), "w+") as f:
-        for line in lines:
-            f.write(line)
-
-    print("Data saved at ./checkpoint")
+    # print("Data saved at ./checkpoint")
     # copydata then save data in another folder
 
 print("Pruing process finished.")
