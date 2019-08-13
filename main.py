@@ -24,6 +24,18 @@ nbonds = 1372
 z = nbonds / natoms
 k = 2.5
 iter_num = itertools.count()
+
+
+def get_G_val() -> int:
+    with open("ShearModulusG.t", "r") as f:  # ShearModulusG.t= G0
+        f.readline()
+        f.readline()
+        lines = filter((lambda x: int(x.split(' ')[0]) > 20000), f.readlines())
+        MG_list = list(map((lambda x: float(x.split(' ')[1])), lines))
+        G0 = statistics.mean(MG_list)
+        return G0
+
+
 # Pruning the network until some kind of condition is met.
 print("#Pruning the network until some kind of condition is met.")
 while z >= k:
@@ -36,13 +48,7 @@ while z >= k:
 
     next(iter_num)
     print("Number of iteration: ", iter_num)
-    with open("ShearModulusG.t", "r") as f:  # ShearModulusG.t= G0
-        f.readline()
-        f.readline()
-        lines = filter((lambda x: int(x.split(' ')[0]) > 20000), f.readlines())
-        MG_list = list(map((lambda x: float(x.split(' ')[1])), lines))
-        G0 = statistics.mean(MG_list)
-
+    G0 = get_G_val()
     print("Initial G0 aqqired:", G0)
 
     # @todo LEGACY CODE
@@ -63,17 +69,14 @@ while z >= k:
     #    nbonds = len(store_bond)
 
     deltaG = []
-    G = []
-    temdeleted = " "
     #    print("nmber of bonds =",b)
     print("Deleting bonds...")
-    for i in range(nbonds):
-        temdeleted = utils.fileio.deleteBond("Bonds", str(i + 1))
-        print("tem =", temdeleted)
-
-        if temdeleted == "PASS":
-            G.append(math.inf)
-            deltaG.append(math.inf)
+    for idx in range(nbonds):
+        try:
+            temdeleted = utils.fileio.deleteBond(idx + 1)
+            print("tem =", temdeleted)
+        except utils.fileio.datafile.BoundNotFoundError:
+            # Already deleted
             continue
 
         else:
@@ -82,33 +85,14 @@ while z >= k:
             lmp = lammps()
             lmp.file("in.shear")
             lmp.close()
-            print("===========Gi test is completed=============")
-
-            with open("ShearModulusG.t", "r") as f:  # ShearModulusG.t= Gi
-                store_MG = []
-                line = f.readline()
-                Sflag = False
-                while line:
-                    line = f.readline()
-
-                    if line.split(" ")[0] == "20000":
-                        Sflag = True
-                    if line.split(" ")[0] == "100000":
-                        Sflag = False
-                    if Sflag:
-                        store = line.split(" ")[1]
-                        store_MG.append(float(store[:-1]))
-
-            total_G = 0
-            for m in range(len(store_MG)):
-                total_G += store_MG[m]
-            G.append(total_G / len(store_MG))
-            deltaG.append(G[i] - G0)
+            print("===========Gi testd is completed=============")
+            tmp_G = get_G_val()
+            deltaG.append((idx, tmp_G - G0))
 
         utils.fileio.recoverBond(temdeleted)
 
-    utils.fileio.deleteBond("Bonds", str(deltaG.index(min(deltaG)) +
-                                       1))  # = lowest deltaGi
+    tmp_idx, min_G = min(deltaG, key=(lambda x: x[0]))
+    utils.fileio.deleteBond(idx + 1)  # = lowest deltaGi
 
     print("Bonds deleted.")
 
