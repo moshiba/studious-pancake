@@ -76,9 +76,9 @@ while z >= k:
     for idx in range(datafile.nbonds):
         print("*"*20)
         print("*"*20)
-        print(f"entering iteration: {idx}")
+        print(f"entering bond iteration: {idx}")
         try:
-            print(f"temdeleted: {temdeleted}")
+            print(f"temdeleted (previous) : {temdeleted}")
         except:
             pass
         print("*"*20)
@@ -95,12 +95,12 @@ while z >= k:
             # Already deleted
             continue
 
-        print(f"===========Obtaining G{idx}=============")
-        print(f"===========G{idx} test begings=============")
+        print(f"===========Obtaining Gi=============")
+        print(f"===========Gi test begings=============")
         lmp = lammps()
         lmp.file("in.shear")
         lmp.close()
-        print(f"===========G{idx} testd is completed=============")
+        print(f"===========Gi testd is completed=============")
         tmp_G = get_GV_val('G')
         deltaG.append((idx, tmp_G - G0))
         # recover what was deleted in 'try'
