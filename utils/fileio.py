@@ -66,7 +66,7 @@ class datafile:
         try:
             assert bond not in self.Bonds
         except AssertionError:
-            raise self.BondAlreadyExistsError(f"bond index: {bond_id}")
+            raise self.BondAlreadyExistsError(f"bond index: {bond}")
 
         self.Bonds.append(bond)
         self.Bonds.sort(key=(lambda x: int(x.split(' ')[0])))
