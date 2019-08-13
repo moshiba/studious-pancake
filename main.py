@@ -76,7 +76,11 @@ while z >= k:
     for idx in range(datafile.nbonds):
         try:
             temdeleted = datafile.deleteBond(idx + 1)
+            print("@"*30)
+            print("@"*30)
             print("tem =", temdeleted)
+            print("@"*30)
+            print("@"*30)
         except utils.fileio.datafile.BoundNotFoundError:
             # Already deleted
             continue
@@ -90,7 +94,7 @@ while z >= k:
             print("===========Gi testd is completed=============")
             tmp_G = get_GV_val('G')
             deltaG.append((idx, tmp_G - G0))
-
+            # recover what was deleted in 'try'
             datafile.recoverBond(temdeleted)
 
     tmp_idx, min_G = min(deltaG, key=(lambda x: x[0]))
