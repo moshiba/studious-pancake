@@ -1,0 +1,111 @@
+#number of particles in 20x20 area
+variable npart  equal 500
+
+units	metal
+
+box tilt large
+dimension 2
+atom_style	molecular
+boundary        p p p
+neighbor        1.2   bin
+neigh_modify    every 1 delay 0 check yes
+
+#temperature (in reduced units)
+variable temp   equal 0.0
+
+#box size (in reduced units)
+variable bsize   equal 10
+
+region box prism -${bsize} ${bsize} -${bsize} ${bsize} -0.1 0.1 0 0 0
+
+create_box 1 box bond/types 1 extra/bond/per/atom 300
+
+#put z=0 all the time
+fix 2d  all enforce2d
+
+#put the particles randomly into the box
+create_atoms 1 random ${npart} 324523 box
+#create_atoms 2 random ${npart} 453452 box
+#create_atoms 3 random ${npart} 2 box
+#create_atoms 4 random ${npart} 32 box
+
+#all light particles has mass 1
+#diameter 1  1.2
+#diameter 2  1.48
+#diameter 3  1.74
+#diameter 4	 2.0
+
+#all particles has mass 1
+mass   *	1
+
+group 1 type 1
+#group 2 type 2
+#group 3 type 3
+#group 4 type 4
+
+#Soft pair interaction between all particles
+pair_style soft      1.0
+pair_coeff 1 1 10.0  1.20
+#pair_coeff 1 2 10.0  1.34
+#pair_coeff 1 3 10.0  1.47
+#pair_coeff 1 4 10.0  1.6
+#pair_coeff 2 2 10.0  1.48
+#pair_coeff 2 3 10.0  1.61
+#pair_coeff 2 4 10.0  1.74
+#pair_coeff 3 3 10.0  1.74
+#pair_coeff 3 4 10.0  1.87
+#pair_coeff 4 4 10.0  2.0
+
+#minimize energy first to avoid overlapping particles
+min_style cg
+minimize 1e-4 1e-4 1000 1000
+
+delete_atoms overlap 0.4 all all
+
+reset_timestep 0
+
+#Bonds
+bond_style harmonic
+bond_coeff 1 1 1
+
+create_bonds many 1 1 1 0 1.2
+#create_bonds many 1 2 1 0 1.34
+#create_bonds many 1 3 1 0 1.47
+#create_bonds many 1 4 1 0 1.6
+#create_bonds many 2 2 1 0 1.48
+#create_bonds many 2 3 1 0 1.61
+#create_bonds many 2 4 1 0 1.74
+#create_bonds many 3 3 1 0 1.74
+#create_bonds many 3 4 1 0 1.87
+#create_bonds many 4 4 1 0 2.0
+
+#Show #of bonds per atom Z
+info system out append info.txt
+
+#save images
+#shell "mkdir img"
+#shell "rm img/*"
+#dump        img all  image  1000 img/t*.jpg    type type   bond type 0.1 zoom 1.7 ssao yes 4539 0.6 atom no
+#dump_modify img adiam 1 0.15
+#dump_modify img adiam 2 0.3
+#dump_modify img adiam 3 0.4
+#dump_modify img adiam 4 0.4
+#dump_modify img backcolor black  boxcolor black
+#dump_modify img pad 6
+
+#save video
+#dump        video all  movie  20 movie.avi    type type  bond type 0.1 zoom 1.7 ssao yes 4539 0.6 atom no
+#dump_modify video adiam 1 1.2
+#dump_modify video adiam 2 1.48
+#dump_modify video adiam 3 1.74 
+#dump_modify video adiam 4 2.0
+#dump_modify video backcolor black  boxcolor black
+
+#fix integrator all nve
+#fix dynamics   all langevin ${temp} ${temp} 1.0 252111
+#fix run2d      all enforce2d
+
+
+#first equilibrate 
+
+write_data data.file
