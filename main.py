@@ -81,7 +81,7 @@ while z >= k:
             print("tem =", temdeleted)
             print("@"*30)
             print("@"*30)
-        except utils.fileio.datafile.BoundNotFoundError:
+        except utils.fileio.datafile.BoundNotFoundError as e:
             # Already deleted
             continue
 
