@@ -52,7 +52,7 @@ class datafile:
             return popped
         except ValueError:
             # cannot find this bond
-            raise self.BoundNotFoundError()
+            raise self.BoundNotFoundError(f"bond index: {bond_id}")
 
     def deleteAtom(self, atom_id: int) -> str:
         # @todo expect class to generalize someday
@@ -66,7 +66,7 @@ class datafile:
         try:
             assert bond not in self.Bonds
         except AssertionError:
-            raise self.BondAlreadyExistsError()
+            raise self.BondAlreadyExistsError(f"bond index: {bond_id}")
 
         self.Bonds.append(bond)
         self.Bonds.sort(key=(lambda x: int(x.split(' ')[0])))
