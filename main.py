@@ -85,17 +85,16 @@ while z >= k:
             # Already deleted
             continue
 
-        else:
-            print("===========Obtaining Gi=============")
-            print("===========Gi test begings=============")
-            lmp = lammps()
-            lmp.file("in.shear")
-            lmp.close()
-            print("===========Gi testd is completed=============")
-            tmp_G = get_GV_val('G')
-            deltaG.append((idx, tmp_G - G0))
-            # recover what was deleted in 'try'
-            datafile.recoverBond(temdeleted)
+        print("===========Obtaining Gi=============")
+        print("===========Gi test begings=============")
+        lmp = lammps()
+        lmp.file("in.shear")
+        lmp.close()
+        print("===========Gi testd is completed=============")
+        tmp_G = get_GV_val('G')
+        deltaG.append((idx, tmp_G - G0))
+        # recover what was deleted in 'try'
+        datafile.recoverBond(temdeleted)
 
     tmp_idx, min_G = min(deltaG, key=(lambda x: x[0]))
     datafile.deleteBond(idx + 1)  # = lowest deltaGi
