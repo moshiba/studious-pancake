@@ -37,7 +37,7 @@ while z >= k:
     next(iter_num)
     print("Number of iteration: ", iter_num)
     with open("ShearModulusG.t", "r") as f:  # ShearModulusG.t= G0
-        lines = f.readlines()[20000:100000]
+        lines = filter((lambda x: int(x.split(' ')[0]) > 20000), f.readlines())
         MG_list = list(map((lambda x: x.split(' ')[1]), lines))
         G0 = statistics.mean(MG_list)
 
