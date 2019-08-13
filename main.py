@@ -26,14 +26,21 @@ k = 2.5
 iter_num = itertools.count()
 
 
-def get_G_val() -> int:
-    with open("ShearModulusG.t", "r") as f:  # ShearModulusG.t= G0
+def get_GV_val(mode: str) -> int:
+    if mode == "G":
+        filename = "ShearModulusG.t"
+    elif mode == "V":
+        filename = "poissonRatioV.t"
+    else:
+        raise Exception
+
+    with open(filename, "r") as f:  # ShearModulusG.t= G0
         f.readline()
         f.readline()
         lines = filter((lambda x: int(x.split(' ')[0]) > 20000), f.readlines())
-        MG_list = list(map((lambda x: float(x.split(' ')[1])), lines))
-        G0 = statistics.mean(MG_list)
-        return G0
+        val_list = list(map((lambda x: float(x.split(' ')[1])), lines))
+        val = statistics.mean(val_list)
+        return val
 
 
 # Pruning the network until some kind of condition is met.
@@ -48,7 +55,7 @@ while z >= k:
 
     next(iter_num)
     print("Number of iteration: ", iter_num)
-    G0 = get_G_val()
+    G0 = get_GV_val('G')
     print("Initial G0 aqqired:", G0)
 
     # @todo LEGACY CODE
@@ -86,7 +93,7 @@ while z >= k:
             lmp.file("in.shear")
             lmp.close()
             print("===========Gi testd is completed=============")
-            tmp_G = get_G_val()
+            tmp_G = get_GV_val('G')
             deltaG.append((idx, tmp_G - G0))
 
         utils.fileio.recoverBond(temdeleted)
@@ -101,25 +108,7 @@ while z >= k:
     lmp.file("in.uniaxial")
     lmp.close()
     print("===========V test is completed=============")
-    with open("poissonRatioV.t", "r") as f:  # S poissonRatioV.t = V
-        store_MV = []
-        line = f.readline()
-        Vflag = False
-        while line:
-            line = f.readline()
-
-            if line.split(" ")[0] == "20000":
-                Vflag = True
-            if line.split(" ")[0] == "100000":
-                Vflag = False
-            if Vflag:
-                store = line.split(" ")[1]
-                store_MV.append(float(store[:-1]))
-
-    total_V = 0
-    for m in range(len(store_MV)):
-        total_V += store_MV[m]
-    V = total_V / len(store_MV)
+    V = get_GV_val('V')
     print("Iteration is completed.")
 
     if not os.path.isdir('./checkpoint'):
