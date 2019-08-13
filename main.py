@@ -91,10 +91,10 @@ while z >= k:
             tmp_G = get_GV_val('G')
             deltaG.append((idx, tmp_G - G0))
 
-        utils.fileio.recoverBond(temdeleted)
+            datafile.recoverBond(temdeleted)
 
     tmp_idx, min_G = min(deltaG, key=(lambda x: x[0]))
-    utils.fileio.deleteBond(idx + 1)  # = lowest deltaGi
+    datafile.deleteBond(idx + 1)  # = lowest deltaGi
 
     print("Bonds deleted.")
 
