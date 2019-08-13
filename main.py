@@ -1,10 +1,10 @@
-import pruningNET
+import utils
 from lammps import lammps
-
 import os
 import math
 import itertools
 import statistics
+
 
 # Aquire some initial condition Z K
 print("Aquiring some initial condition eg. Z and K")
@@ -27,7 +27,6 @@ iter_num = itertools.count()
 # Pruning the network until some kind of condition is met.
 print("#Pruning the network until some kind of condition is met.")
 while z >= k:
-
     print("===========Obtaining G0=============")
     print("===========G0 test begins=============")
     lmp = lammps()
@@ -67,11 +66,7 @@ while z >= k:
     #    print("nmber of bonds =",b)
     print("Deleting bonds...")
     for i in range(nbonds):
-
-        if i != 0:
-            pruningNET.resumebond(temdeleted)
-
-        temdeleted = pruningNET.deletebond("Bonds", str(i + 1))
+        temdeleted = utils.fileio.deleteBond("Bonds", str(i + 1))
         print("tem =", temdeleted)
 
         if temdeleted == "PASS":
@@ -108,9 +103,9 @@ while z >= k:
             G.append(total_G / len(store_MG))
             deltaG.append(G[i] - G0)
 
-    pruningNET.resumebond(temdeleted)
+        utils.fileio.recoverBond(temdeleted)
 
-    pruningNET.deletebond("Bonds", str(deltaG.index(min(deltaG)) +
+    utils.fileio.deleteBond("Bonds", str(deltaG.index(min(deltaG)) +
                                        1))  # = lowest deltaGi
 
     print("Bonds deleted.")
@@ -135,7 +130,6 @@ while z >= k:
                 store = line.split(" ")[1]
                 store_MV.append(float(store[:-1]))
 
-
     total_V = 0
     for m in range(len(store_MV)):
         total_V += store_MV[m]
@@ -159,7 +153,6 @@ while z >= k:
     with open("./checkpoint/data_v{}_z{}.file".format(V, z), "w+") as f:
         for line in lines:
             f.write(line)
-
 
     print("Data saved at ./checkpoint")
     # copydata then save data in another folder
