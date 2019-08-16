@@ -179,3 +179,14 @@ class TestProperties:
         df.Bonds = ["54\n", "56\n", "58\n"]
         for i in range(3):
             assert df.groups[14][i] == f"{2*(i+27)}\n"
+
+def test_deleteAtom(grouping_df):
+    df = grouping_df
+    with pytest.raises(NotImplementedError):
+        df.deleteAtom(10)
+
+
+def test_recoverAtom(grouping_df):
+    df = grouping_df
+    with pytest.raises(NotImplementedError):
+        df.recoverAtom("not impl")
