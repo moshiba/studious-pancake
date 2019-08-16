@@ -127,8 +127,12 @@ class TestProperties:
 
     def test_Masses(self, properties_df):
         df = properties_df
-        # TODO: test content reading ability
-        # TODO: test if return value is 'pass by reference'
+        assert df.groups[4] == ["g5\n"]
+        assert df.Masses == ["g5\n"]
+
+        df.Masses = ["54\n", "56\n", "58\n"]
+        for i in range(3):
+            assert df.groups[4][i] == f"{2*(i+27)}\n"
 
     def test_PairCoeffs_soft(self, properties_df):
         df = properties_df
