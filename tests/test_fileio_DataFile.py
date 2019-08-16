@@ -136,25 +136,46 @@ class TestProperties:
 
     def test_PairCoeffs_soft(self, properties_df):
         df = properties_df
-        # TODO: test content reading ability
-        # TODO: test if return value is 'pass by reference'
+        assert df.groups[6] == ["g7\n"]
+        assert df.PairCoeffs_soft == ["g7\n"]
+
+        df.PairCoeffs_soft = ["54\n", "56\n", "58\n"]
+        for i in range(3):
+            assert df.groups[6][i] == f"{2*(i+27)}\n"
 
     def test_BondCoeffs_harmonic(self, properties_df):
         df = properties_df
-        # TODO: test content reading ability
-        # TODO: test if return value is 'pass by reference'
+        assert df.groups[8] == ["g9\n"]
+        assert df.BondCoeffs_harmonic == ["g9\n"]
+
+        df.BondCoeffs_harmonic = ["54\n", "56\n", "58\n"]
+        for i in range(3):
+            assert df.groups[8][i] == f"{2*(i+27)}\n"
 
     def test_Atoms_molecular(self, properties_df):
         df = properties_df
-        # TODO: test content reading ability
-        # TODO: test if return value is 'pass by reference'
+        df.Atoms_molecular
+        assert df.groups[10] == ["g11\n"]
+        assert df.Atoms_molecular == ["g11\n"]
+
+        df.Atoms_molecular = ["54\n", "56\n", "58\n"]
+        for i in range(3):
+            assert df.groups[10][i] == f"{2*(i+27)}\n"
 
     def test_Velocities(self, properties_df):
         df = properties_df
-        # TODO: test content reading ability
-        # TODO: test if return value is 'pass by reference'
+        assert df.groups[12] == ["g13\n"]
+        assert df.Velocities == ["g13\n"]
+
+        df.Velocities = ["54\n", "56\n", "58\n"]
+        for i in range(3):
+            assert df.groups[12][i] == f"{2*(i+27)}\n"
 
     def test_Bonds(self, properties_df):
         df = properties_df
-        # TODO: test content reading ability
-        # TODO: test if return value is 'pass by reference'
+        assert df.groups[14] == ["g15\n"]
+        assert df.Bonds == ["g15\n"]
+
+        df.Bonds = ["54\n", "56\n", "58\n"]
+        for i in range(3):
+            assert df.groups[14][i] == f"{2*(i+27)}\n"
