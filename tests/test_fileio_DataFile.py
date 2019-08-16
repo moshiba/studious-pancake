@@ -32,28 +32,6 @@ def test_update_grouping(grouping_df):
         assert df.groups[i][0] == 'g' + str(i+1) + '\n'
 
 
-def test_flag_handling(grouping_df):
-    df = grouping_df
-    assert df._DataFile__latest == df.is_latest
-
-    df.file_changed()
-    assert df._DataFile__latest == df.is_latest
-
-    df._DataFile__update()
-    assert df._DataFile__latest == df.is_latest
-
-
-def test_update_flaging(grouping_df):
-    df = grouping_df
-    assert df.is_latest is True
-
-    df.file_changed()
-    assert df.is_latest is False
-
-    df._DataFile__update()
-    assert df.is_latest is True
-
-
 def test_writeback_clear(writeback_df):
     df = writeback_df
     for i in range(len(df.groups)):
@@ -80,3 +58,23 @@ def test_writeback_alter(writeback_df):
                 assert lines[i] == "test even\n"
             else:
                 assert lines[i] == "\n"
+
+
+class TestProperties:
+    def test_is_latest(self, grouping_df):
+        df = grouping_df
+        assert df.is_latest is True
+        assert df._DataFile__latest == df.is_latest
+
+        df._DataFile__latest = False
+        assert df.is_latest is False
+
+        df._DataFile__latest = True
+        assert df.is_latest is True
+
+    def test_file_changed(self, grouping_df):
+        df = grouping_df
+        assert df._DataFile__latest is True
+
+        df.file_changed()
+        assert df._DataFile__latest is False
