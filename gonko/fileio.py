@@ -128,11 +128,19 @@ class DataFile:
         """
         return self.groups[4]
 
+    @Masses.setter
+    def Masses(self, update: list):
+        self.groups[4] = update
+
     @property
     def PairCoeffs_soft(self):
         """
         """
         return self.groups[6]
+
+    @PairCoeffs_soft.setter
+    def PairCoeffs_soft(self, update: list):
+        self.groups[6] = update
 
     @property
     def BondCoeffs_harmonic(self):
@@ -140,11 +148,19 @@ class DataFile:
         """
         return self.groups[8]
 
+    @BondCoeffs_harmonic.setter
+    def BondCoeffs_harmonic(self, update: list):
+        self.groups[8] = update
+
     @property
     def Atoms_molecular(self):
         """
         """
         return self.groups[10]
+
+    @Atoms_molecular.setter
+    def Atoms_molecular(self, update: list):
+        self.groups[10] = update
 
     @property
     def Velocities(self):
@@ -152,11 +168,19 @@ class DataFile:
         """
         return self.groups[12]
 
+    @Velocities.setter
+    def Velocities(self, update: list):
+        self.groups[12] = update
+
     @property
     def Bonds(self):
         """
         """
         return self.groups[14]
+
+    @Bonds.setter
+    def Bonds(self, update: list):
+        self.groups[14] = update
 
     class NotFoundError(Exception):
         pass
