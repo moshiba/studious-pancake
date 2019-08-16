@@ -3,10 +3,11 @@
 helper functions for file I/O
 
 """
+import statistics
 import itertools
 
 
-class datafile:
+class DataFile:
     """
     represents a 'data.file'
     """
@@ -26,7 +27,7 @@ class datafile:
                 groups.append(list(g))  # Store group iterator as a list
                 uniquekeys.append(k)
         stripped = filter((lambda x: x[0] is False), zip(uniquekeys, groups))
-        self.groups = list(zip(*stripped))[1]
+        self.groups = list(list(zip(*stripped))[1])
 
         self.__latest = True  # lazy evaluation flag
 
@@ -39,6 +40,9 @@ class datafile:
 
     def deleteBond(self, bond_id: int) -> str:
         """
+            parameter:
+                bond_id: index of the bond,
+                    * not the index of the array containing the 'Bonds' section
         """
         bond_id = str(bond_id)
         try:
@@ -69,7 +73,11 @@ class datafile:
             raise self.BondAlreadyExistsError(f"bond index: {bond}")
 
         self.Bonds.append(bond)
-        self.Bonds.sort(key=(lambda x: int(x.split(' ')[0])))
+        assert bond in self.Bonds
+        assert bond in self.groups[14]
+        print(len(self.Bonds))
+        print(self.Bonds.index(bond))
+        # self.Bonds.sort(key=(lambda x: int(x.split(' ')[0])))  DEBUG
         self.set_nbonds(self.nbonds + 1)
 
         self.__writeback()
@@ -167,3 +175,64 @@ class datafile:
 
     class AtomAlreadyExistsError(AlreadyExistsError):
         pass
+
+
+class ScriptFile:
+    def __init__(self, filename):
+        self.filename = filename
+
+
+class ShearScript(ScriptFile):
+    def __init__(self, filename):
+        super().__init__(filename)
+
+
+class UniaxialScript(ScriptFile):
+    def __init__(self, filename):
+        super().__init__(filename)
+
+
+class ScriptOuput:
+    def __init__(self, filename):
+        self.filename = filename
+
+    @property
+    def avg(self, low_bound, high_bound) -> float:
+        """ Average:
+
+            parameters:
+                low_bound:  valid number low bound
+                high_bound: valid number high bound
+
+        opens a file,
+        retrieve designated lines according to the filter parameters,
+        returns the average value
+
+        """
+
+        with open(self.filename, "r") as f:
+            # read and ignore headers
+            f.readline()
+            f.readline()
+
+            def range_selector(x):  # dynamically defined filter
+                """ filter indexes of lines to be within designated range """
+                num = int(x.split(' ')[0])
+                return high_bound > num and num > low_bound
+
+            lines = filter(range_selector, f.readlines())
+            val_list = list(map((lambda x: float(x.split(' ')[1])), lines))
+            val = statistics.mean(val_list)
+            return val
+
+
+class ShearOutput(ScriptOuput):
+    def __init__(self, filename):
+        assert filename == "ShearModulusG.t"
+        super().__init__(filename)
+
+
+class UniaxialOutput(ScriptOuput):
+    def __init__(self, filename):
+        assert filename == "poissonRatioV.t"
+        super().__init__(filename)
