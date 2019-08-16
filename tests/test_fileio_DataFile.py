@@ -124,3 +124,33 @@ class TestProperties:
         assert df.nbonds == 1356
         df.set_nbonds(99)
         assert df.groups[1][2] == "99 bonds\n"
+
+    def test_Masses(self, properties_df):
+        df = properties_df
+        # TODO: test content reading ability
+        # TODO: test if return value is 'pass by reference'
+
+    def test_PairCoeffs_soft(self, properties_df):
+        df = properties_df
+        # TODO: test content reading ability
+        # TODO: test if return value is 'pass by reference'
+
+    def test_BondCoeffs_harmonic(self, properties_df):
+        df = properties_df
+        # TODO: test content reading ability
+        # TODO: test if return value is 'pass by reference'
+
+    def test_Atoms_molecular(self, properties_df):
+        df = properties_df
+        # TODO: test content reading ability
+        # TODO: test if return value is 'pass by reference'
+
+    def test_Velocities(self, properties_df):
+        df = properties_df
+        # TODO: test content reading ability
+        # TODO: test if return value is 'pass by reference'
+
+    def test_Bonds(self, properties_df):
+        df = properties_df
+        # TODO: test content reading ability
+        # TODO: test if return value is 'pass by reference'
