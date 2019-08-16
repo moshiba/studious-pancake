@@ -24,6 +24,18 @@ def writeback_df():
     os.remove(df_path + "test")
 
 
+
+
+@pytest.fixture(scope="function")
+def properties_df():
+    NAME = "properties"
+    df_path = "tests/data/" + NAME + ".datafile."
+    shutil.copy(df_path + "ORIG", df_path + "test")
+    yield DataFile(df_path + "test")
+    print("teardown df")
+    os.remove(df_path + "test")
+
+
 def test_update_grouping(grouping_df):
     df = grouping_df
     assert len(df.groups) == 15
@@ -78,3 +90,20 @@ class TestProperties:
 
         df.file_changed()
         assert df._DataFile__latest is False
+
+    def test_natoms(self, properties_df):
+        df = properties_df
+        assert df.natoms == 459
+
+        df.groups[1][0] = "123 atoms\n"
+        assert df.is_latest is True
+        assert df.natoms == 123
+
+        df.file_changed()
+        assert df.natoms == 459
+
+    def test_set_natoms(self, properties_df):
+        df = properties_df
+        assert df.natoms == 459
+        df.set_natoms(10)
+        assert df.groups[1][0] == "10 atoms\n"
