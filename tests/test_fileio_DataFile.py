@@ -107,3 +107,20 @@ class TestProperties:
         assert df.natoms == 459
         df.set_natoms(10)
         assert df.groups[1][0] == "10 atoms\n"
+
+    def test_nbonds(self, properties_df):
+        df = properties_df
+        assert df.nbonds == 1356
+
+        df.groups[1][2] = "246 bonds\n"
+        assert df.is_latest is True
+        assert df.nbonds == 246
+
+        df.file_changed()
+        assert df.nbonds == 1356
+
+    def test_set_nbonds(self, properties_df):
+        df = properties_df
+        assert df.nbonds == 1356
+        df.set_nbonds(99)
+        assert df.groups[1][2] == "99 bonds\n"
