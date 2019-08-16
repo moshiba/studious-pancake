@@ -1,0 +1,8 @@
+[run]
+branch = True
+cover_pylib = True
+omit =
+    env/*
+
+[report]
+show_missing = True
