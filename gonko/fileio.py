@@ -64,7 +64,7 @@ class DataFile:
         """
         raise NotImplementedError
 
-    def recoverBond(self, bond: str):
+    def addBond(self, bond: str):
         """
         """
         try:
@@ -83,7 +83,7 @@ class DataFile:
         self.__writeback()
         self.file_changed()
 
-    def recoverAtom(self, atom: str):
+    def addAtom(self, atom: str):
         # @todo expect class to generalize someday
         """
         """
