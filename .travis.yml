@@ -9,3 +9,8 @@ install:
 
 script:
     - pytest
+
+notifications:
+    slack: w1566050171-ore544597:qrufrcYdFo2qxomjGYMJ1Xol
+        on_success: always
+        on_failure: always
