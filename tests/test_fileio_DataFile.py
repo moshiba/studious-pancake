@@ -205,9 +205,9 @@ def test_deleteBond(bondDel_df):
     pass
 
 
-def test_addBond(bondDel_df):
+def test_addBond(bondAdd_df):
     # self.Bonds = self.groups[14]
-    df = bondDel_df
+    df = bondAdd_df
     pass
 
 
@@ -220,4 +220,4 @@ def test_deleteAtom(grouping_df):
 def test_recoverAtom(grouping_df):
     df = grouping_df
     with pytest.raises(NotImplementedError):
-        df.recoverAtom("not impl")
+        df.addAtom("not impl")
