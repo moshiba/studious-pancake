@@ -24,6 +24,24 @@ def writeback_df():
     os.remove(df_path + "test")
 
 
+@pytest.fixture(scope="function")
+def bondDel_df():
+    NAME = "bondDel"
+    df_path = "tests/data/" + NAME + ".datafile."
+    shutil.copy(df_path + "ORIG", df_path + "test")
+    yield DataFile(df_path + "test")
+    print("teardown df")
+    os.remove(df_path + "test")
+
+
+@pytest.fixture(scope="function")
+def bondAdd_df():
+    NAME = "bondAdd"
+    df_path = "tests/data/" + NAME + ".datafile."
+    shutil.copy(df_path + "ORIG", df_path + "test")
+    yield DataFile(df_path + "test")
+    print("teardown df")
+    os.remove(df_path + "test")
 
 
 @pytest.fixture(scope="function")
@@ -179,6 +197,19 @@ class TestProperties:
         df.Bonds = ["54\n", "56\n", "58\n"]
         for i in range(3):
             assert df.groups[14][i] == f"{2*(i+27)}\n"
+
+
+def test_deleteBond(bondDel_df):
+    # self.Bonds = self.groups[14]
+    df = bondDel_df
+    pass
+
+
+def test_addBond(bondDel_df):
+    # self.Bonds = self.groups[14]
+    df = bondDel_df
+    pass
+
 
 def test_deleteAtom(grouping_df):
     df = grouping_df
