@@ -9,5 +9,5 @@ script:
 notifications:
   slack:
     secure: XZ0ntY0RY/W5D2gEpRy/nEl/iAovD/Je0Pi50z3d5anMajAGcWWDEK90S9YPHww4o3JCZWYMJ7BSZNzih9re2O3f3PpxLb6E8GWgPuxGOjiPw2+mR2rLk5YEfacUy/BApZZsJPSb43t+epGgrFrvQ33AE3dtxhE8XtfhLfJqb+u1SxOuih+7LEDI5WX3Tws+GSEEpAeW1h0LEtrh1ExnOqY1fJ7K0zs6HJnA+XTuWHiVCFGaA0VyADbTM8aVsqli/jnJM8yaqwioSJtW8Vv+PpacYuieMXOZfPgL93SiKHjTDBuzKrKHpp+NGVsZxtSqprM43pKINmpqSVZZlmgi6KKrhZEe7Go7jhIvEohGTmqeX5YwXlIoKLjsflIca2FWi+ydZ8yeQ1eyT2QVmfn62OzPLtZzPK1TPYc2VfhGMnB1ilSkkleY5/yciCJC8FJlzgrVCh5JAuu8ggO+V5a5LVWl5XDrpnYDJ5oSNgf1wBqax3LzFBoGqQz3bPm87HImIycaX8Mxy0PUilMO1RKGppjFlxnvBtcSn3sH5ABpSJfTzGvDVK0s2CRXioCSX48WI+9qF6Jt8K+XC7+fdkfMFnDZW4Di3tqCPH9o72v0iyM4CymLCn8GkaPsf54wqqYzZd6GSlKsMcHlmBjNv/BaiD6SzSl6wLvHswyw244u3pQ=
-        on_success: always
-        on_failure: always
+    on_success: always
+    on_failure: always
