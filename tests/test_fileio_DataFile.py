@@ -212,7 +212,7 @@ def test_deleteBond_succeed(bondDel_df):
 
 def test_deleteBond_fail(bondDel_df):
     df = bondDel_df
-    assert df.nbonds = 20
+    assert df.nbonds == 20
     with pytest.raises(DataFile.BondNotFoundError) as e:
         df.deleteBond(2000)
 
