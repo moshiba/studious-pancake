@@ -201,34 +201,50 @@ class TestProperties:
 
 def test_deleteBond_succeed(bondDel_df):
     df = bondDel_df
+    assert df.nbonds == 20
     df.deleteBond(1)
+    assert df.nbonds == 19
 
     f = DataFile(df.filename)
+    assert f.nbonds == 19
     assert "1 1 1 489\n" not in f.groups[14]
 
 
 def test_deleteBond_fail(bondDel_df):
     df = bondDel_df
+    assert df.nbonds = 20
     with pytest.raises(DataFile.BondNotFoundError) as e:
         df.deleteBond(2000)
 
-    assert r"bond index: 2000" == str(e.value)
+    assert "bond index: 2000" == str(e.value)
+    assert df.nbonds == 20
+
+    f = DataFile(df.filename)
+    assert f.nbonds == 20
 
 
 def test_addBond_succeed(bondAdd_df):
     df = bondAdd_df
+    assert df.nbonds == 17
     df.addBond("2 1 1 481\n")
+    assert df.nbonds == 18
 
     f = DataFile(df.filename)
     assert "2 1 1 481\n" in f.groups[14]
+    assert f.nbonds == 18
 
 
 def test_addBond_fail(bondAdd_df):
     df = bondAdd_df
+    assert df.nbonds == 17
     with pytest.raises(DataFile.BondAlreadyExistsError) as e:
         df.addBond("1 1 1 489\n")
 
     assert "bond: 1 1 1 489\n" == str(e.value)
+    assert df.nbonds == 17
+
+    f = DataFile(df.filename)
+    assert f.nbonds == 17
 
 
 def test_deleteAtom(grouping_df):
