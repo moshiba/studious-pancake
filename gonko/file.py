@@ -1,6 +1,6 @@
-""" fileio
+""" file
 ------------
-helper functions for file I/O
+helper functions for files
 
 """
 import statistics
@@ -206,23 +206,16 @@ class ScriptFile:
     def __init__(self, filename):
         self.filename = filename
 
-
-class ShearScript(ScriptFile):
-    def __init__(self, filename):
-        super().__init__(filename)
-
-
-class UniaxialScript(ScriptFile):
-    def __init__(self, filename):
-        super().__init__(filename)
+    def run():
+        pass
 
 
 class ScriptOuput:
-    def __init__(self, filename):
+    def __init__(self, filename: str):
         self.filename = filename
 
     @property
-    def avg(self, low_bound, high_bound) -> float:
+    def avg(self, low_bound: int, high_bound: int) -> float:
         """ Average:
 
             parameters:
@@ -249,15 +242,3 @@ class ScriptOuput:
             val_list = list(map((lambda x: float(x.split(' ')[1])), lines))
             val = statistics.mean(val_list)
             return val
-
-
-class ShearOutput(ScriptOuput):
-    def __init__(self, filename):
-        assert filename == "ShearModulusG.t"
-        super().__init__(filename)
-
-
-class UniaxialOutput(ScriptOuput):
-    def __init__(self, filename):
-        assert filename == "poissonRatioV.t"
-        super().__init__(filename)

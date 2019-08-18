@@ -1,7 +1,7 @@
 import os
 import shutil
 import pytest
-from gonko.fileio import DataFile
+from gonko.file import DataFile
 
 
 @pytest.fixture(scope="function")
