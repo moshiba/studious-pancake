@@ -27,7 +27,7 @@ def test_update_grouping(df_factory):
     assert len(df.groups) == 15
     for i in range(15):
         assert len(df.groups[i]) == 1
-        assert df.groups[i][0] == 'g' + str(i+1) + '\n'
+        assert df.groups[i][0] == 'g' + str(i + 1) + '\n'
 
 
 def test_writeback_clear(df_factory):
