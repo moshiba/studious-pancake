@@ -226,8 +226,8 @@ def test_addBond_succeed(bondAdd_df):
 def test_addBond_fail(bondAdd_df):
     df = bondAdd_df
     with pytest.raises(DataFile.BondAlreadyExistsError) as e:
-        df.addBond("2 1 1 481\n")
-    assert r"bond index: 2" == str(e.value)
+        df.addBond("1 1 1 489\n")
+    assert r"bond index: 1" == str(e.value)
 
 
 def test_deleteAtom(grouping_df):
