@@ -209,7 +209,7 @@ def test_deleteBond_succeed(bondDel_df):
 
 def test_deleteBond_fail(bondDel_df):
     df = bondDel_df
-    with pytest.raises(gonko.DataFile.BondNotFoundError) as e:
+    with pytest.raises(DataFile.BondNotFoundError) as e:
         df.deleteBond(2000)
 
     assert str(e.message) == r"bond index: 2000"
