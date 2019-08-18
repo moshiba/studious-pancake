@@ -71,7 +71,7 @@ class DataFile:
         try:
             assert bond not in self.Bonds
         except AssertionError:
-            raise self.BondAlreadyExistsError(f"bond index: {bond}")
+            raise self.BondAlreadyExistsError(f"bond: {bond}")
 
         self.Bonds.append(bond)
         assert bond in self.Bonds
