@@ -57,7 +57,7 @@ class DataFile:
             return popped
         except ValueError:
             # cannot find this bond
-            raise self.BoundNotFoundError(f"bond index: {bond_id}")
+            raise self.BondNotFoundError(f"bond index: {bond_id}")
 
     def deleteAtom(self, atom_id: int) -> str:
         # @todo expect class to generalize someday
@@ -186,7 +186,7 @@ class DataFile:
     class NotFoundError(Exception):
         pass
 
-    class BoundNotFoundError(NotFoundError):
+    class BondNotFoundError(NotFoundError):
         pass
 
     class AtomNotFoundError(NotFoundError):
