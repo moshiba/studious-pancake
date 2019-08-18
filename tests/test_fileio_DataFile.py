@@ -5,6 +5,22 @@ from gonko.fileio import DataFile
 
 
 @pytest.fixture(scope="function")
+def df():
+    created_records = set()
+
+    def _df(name):
+        df_path = "tests/data/" + name + ".datafile."
+        shutil.copy(df_path + "ORIG", df_path + "test")
+        created_records.add(name)
+        return DataFile(df_path + "test")
+
+    for record in created_records:
+        print(f"teardown df: {record}")
+        os.remove(df_path + "test")
+        
+
+
+@pytest.fixture(scope="function")
 def grouping_df():
     NAME = "grouping"
     df_path = "tests/data/" + NAME + ".datafile."
