@@ -5,83 +5,33 @@ from gonko.fileio import DataFile
 
 
 @pytest.fixture(scope="function")
-def df_handler():
+def df_factory():
     created_records = set()
 
-    def _df_handler(name):
+    def _df_factory(name):
         df_path = "tests/data/" + name + ".datafile."
         shutil.copy(df_path + "ORIG", df_path + "test")
         created_records.add(name)
         return DataFile(df_path + "test")
 
-    yield _df_handler
+    yield _df_factory
 
     for record in created_records:
         print(f"teardown df: {record}")
         df_path = "tests/data/" + record + ".datafile."
         os.remove(df_path + "test")
-        
-
-@pytest.fixture(scope="function")
-def grouping_df():
-    NAME = "grouping"
-    df_path = "tests/data/" + NAME + ".datafile."
-    shutil.copy(df_path + "ORIG", df_path + "test")
-    yield DataFile(df_path + "test")
-    print("teardown df")
-    os.remove(df_path + "test")
 
 
-@pytest.fixture(scope="function")
-def writeback_df():
-    NAME = "writeback"
-    df_path = "tests/data/" + NAME + ".datafile."
-    shutil.copy(df_path + "ORIG", df_path + "test")
-    yield DataFile(df_path + "test")
-    print("teardown df")
-    os.remove(df_path + "test")
-
-
-@pytest.fixture(scope="function")
-def bondDel_df():
-    NAME = "bondDel"
-    df_path = "tests/data/" + NAME + ".datafile."
-    shutil.copy(df_path + "ORIG", df_path + "test")
-    yield DataFile(df_path + "test")
-    print("teardown df")
-    os.remove(df_path + "test")
-
-
-@pytest.fixture(scope="function")
-def bondAdd_df():
-    NAME = "bondAdd"
-    df_path = "tests/data/" + NAME + ".datafile."
-    shutil.copy(df_path + "ORIG", df_path + "test")
-    yield DataFile(df_path + "test")
-    print("teardown df")
-    os.remove(df_path + "test")
-
-
-@pytest.fixture(scope="function")
-def properties_df():
-    NAME = "properties"
-    df_path = "tests/data/" + NAME + ".datafile."
-    shutil.copy(df_path + "ORIG", df_path + "test")
-    yield DataFile(df_path + "test")
-    print("teardown df")
-    os.remove(df_path + "test")
-
-
-def test_update_grouping(df_handler):
-    df = df_handler("grouping")
+def test_update_grouping(df_factory):
+    df = df_factory("grouping")
     assert len(df.groups) == 15
     for i in range(15):
         assert len(df.groups[i]) == 1
         assert df.groups[i][0] == 'g' + str(i+1) + '\n'
 
 
-def test_writeback_clear(writeback_df):
-    df = writeback_df
+def test_writeback_clear(df_factory):
+    df = df_factory("writeback")
     for i in range(len(df.groups)):
         df.groups[i] = ['']
     df._DataFile__writeback()
@@ -89,8 +39,8 @@ def test_writeback_clear(writeback_df):
         assert all(map((lambda x: x == '\n'), f.readlines()))
 
 
-def test_writeback_alter(writeback_df):
-    df = writeback_df
+def test_writeback_alter(df_factory):
+    df = df_factory("writeback")
     for i in range(len(df.groups)):  # 15 groups
         if i % 2 == 1:
             df.groups[i] = ['test even\n']
@@ -109,8 +59,8 @@ def test_writeback_alter(writeback_df):
 
 
 class TestProperties:
-    def test_is_latest(self, grouping_df):
-        df = grouping_df
+    def test_is_latest(self, df_factory):
+        df = df_factory("grouping")
         assert df.is_latest is True
         assert df._DataFile__latest == df.is_latest
 
@@ -120,15 +70,15 @@ class TestProperties:
         df._DataFile__latest = True
         assert df.is_latest is True
 
-    def test_file_changed(self, grouping_df):
-        df = grouping_df
+    def test_file_changed(self, df_factory):
+        df = df_factory("grouping")
         assert df._DataFile__latest is True
 
         df.file_changed()
         assert df._DataFile__latest is False
 
-    def test_natoms(self, properties_df):
-        df = properties_df
+    def test_natoms(self, df_factory):
+        df = df_factory("properties")
         assert df.natoms == 459
 
         df.groups[1][0] = "123 atoms\n"
@@ -138,14 +88,14 @@ class TestProperties:
         df.file_changed()
         assert df.natoms == 459
 
-    def test_set_natoms(self, properties_df):
-        df = properties_df
+    def test_set_natoms(self, df_factory):
+        df = df_factory("properties")
         assert df.natoms == 459
         df.set_natoms(10)
         assert df.groups[1][0] == "10 atoms\n"
 
-    def test_nbonds(self, properties_df):
-        df = properties_df
+    def test_nbonds(self, df_factory):
+        df = df_factory("properties")
         assert df.nbonds == 1356
 
         df.groups[1][2] = "246 bonds\n"
@@ -155,14 +105,14 @@ class TestProperties:
         df.file_changed()
         assert df.nbonds == 1356
 
-    def test_set_nbonds(self, properties_df):
-        df = properties_df
+    def test_set_nbonds(self, df_factory):
+        df = df_factory("properties")
         assert df.nbonds == 1356
         df.set_nbonds(99)
         assert df.groups[1][2] == "99 bonds\n"
 
-    def test_Masses(self, properties_df):
-        df = properties_df
+    def test_Masses(self, df_factory):
+        df = df_factory("properties")
         assert df.groups[4] == ["g5\n"]
         assert df.Masses == ["g5\n"]
 
@@ -170,8 +120,8 @@ class TestProperties:
         for i in range(3):
             assert df.groups[4][i] == f"{2*(i+27)}\n"
 
-    def test_PairCoeffs_soft(self, properties_df):
-        df = properties_df
+    def test_PairCoeffs_soft(self, df_factory):
+        df = df_factory("properties")
         assert df.groups[6] == ["g7\n"]
         assert df.PairCoeffs_soft == ["g7\n"]
 
@@ -179,8 +129,8 @@ class TestProperties:
         for i in range(3):
             assert df.groups[6][i] == f"{2*(i+27)}\n"
 
-    def test_BondCoeffs_harmonic(self, properties_df):
-        df = properties_df
+    def test_BondCoeffs_harmonic(self, df_factory):
+        df = df_factory("properties")
         assert df.groups[8] == ["g9\n"]
         assert df.BondCoeffs_harmonic == ["g9\n"]
 
@@ -188,8 +138,8 @@ class TestProperties:
         for i in range(3):
             assert df.groups[8][i] == f"{2*(i+27)}\n"
 
-    def test_Atoms_molecular(self, properties_df):
-        df = properties_df
+    def test_Atoms_molecular(self, df_factory):
+        df = df_factory("properties")
         df.Atoms_molecular
         assert df.groups[10] == ["g11\n"]
         assert df.Atoms_molecular == ["g11\n"]
@@ -198,8 +148,8 @@ class TestProperties:
         for i in range(3):
             assert df.groups[10][i] == f"{2*(i+27)}\n"
 
-    def test_Velocities(self, properties_df):
-        df = properties_df
+    def test_Velocities(self, df_factory):
+        df = df_factory("properties")
         assert df.groups[12] == ["g13\n"]
         assert df.Velocities == ["g13\n"]
 
@@ -207,8 +157,8 @@ class TestProperties:
         for i in range(3):
             assert df.groups[12][i] == f"{2*(i+27)}\n"
 
-    def test_Bonds(self, properties_df):
-        df = properties_df
+    def test_Bonds(self, df_factory):
+        df = ("properties")
         assert df.groups[14] == ["g15\n"]
         assert df.Bonds == ["g15\n"]
 
@@ -217,8 +167,8 @@ class TestProperties:
             assert df.groups[14][i] == f"{2*(i+27)}\n"
 
 
-def test_deleteBond_succeed(bondDel_df):
-    df = bondDel_df
+def test_deleteBond_succeed(df_factory):
+    df = df_factory("bondDel")
     assert df.nbonds == 20
     df.deleteBond(1)
     assert df.nbonds == 19
@@ -228,8 +178,8 @@ def test_deleteBond_succeed(bondDel_df):
     assert "1 1 1 489\n" not in f.groups[14]
 
 
-def test_deleteBond_fail(bondDel_df):
-    df = bondDel_df
+def test_deleteBond_fail(df_factory):
+    df = df_factory("bondDel")
     assert df.nbonds == 20
     with pytest.raises(DataFile.BondNotFoundError) as e:
         df.deleteBond(2000)
@@ -241,8 +191,8 @@ def test_deleteBond_fail(bondDel_df):
     assert f.nbonds == 20
 
 
-def test_addBond_succeed(bondAdd_df):
-    df = bondAdd_df
+def test_addBond_succeed(df_factory):
+    df = df_factory("bondAdd")
     assert df.nbonds == 17
     df.addBond("2 1 1 481\n")
     assert df.nbonds == 18
@@ -252,8 +202,8 @@ def test_addBond_succeed(bondAdd_df):
     assert f.nbonds == 18
 
 
-def test_addBond_fail(bondAdd_df):
-    df = bondAdd_df
+def test_addBond_fail(df_factory):
+    df = df_factory("bondAdd")
     assert df.nbonds == 17
     with pytest.raises(DataFile.BondAlreadyExistsError) as e:
         df.addBond("1 1 1 489\n")
@@ -265,13 +215,13 @@ def test_addBond_fail(bondAdd_df):
     assert f.nbonds == 17
 
 
-def test_deleteAtom(grouping_df):
-    df = grouping_df
+def test_deleteAtom(df_factory):
+    df = df_factory("grouping")
     with pytest.raises(NotImplementedError):
         df.deleteAtom(10)
 
 
-def test_recoverAtom(grouping_df):
-    df = grouping_df
+def test_recoverAtom(df_factory):
+    df = df_factory("grouping")
     with pytest.raises(NotImplementedError):
         df.addAtom("not impl")
