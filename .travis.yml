@@ -8,7 +8,7 @@ script:
 - pytest
 notifications:
   slack:
-    on_success: always
-    on_failure: always
     rooms:
       secure: lybk6wmwgUOm44UzJRrOtoCqlkOLpL0y3A4iKfKj6qhPBq04Rq9wgB9dl5Nj5hconvdRnIQULP0H+fsEVkfWEq8N58MHHWVlG1nJDsUSfPDAIstlDXGp1OkRMl1sz1JdR1vDioJh8sjv/BzbneAh+jiuOrl/GK4DCJuGZTF+dV0odbBFQQ3MOPbCmclFad+IvQQdybfUGNL8iSAbMBjosJPIsYqm2uOPsdTb9vDHd0tfvNn7uOc8xoukDCuJ1vG/r5EZo1Dgdez6AACrKzD3rGwnduiqc7+l7jIWsEnVvsWqc1lZmkzo+tUxgFR47jVF6hGZQa7GMgPJSbECnuMBB2iAYukMNrsqQoaoo9T3gaMQgdYmn44j+5AZtHokQUrv35XN2nijntsKm63SLQIsnuKx/V5D7JmVv+vZFrjIMa8xqYHUVh2Phs9TSqto03pHPCf7e81GfDtuqVNR35HuDThV+aaAK6MsM1FJoHtMBPbHO96PvlZFyniJaAr1s3lRNFd/POLV6/YNIzsPjqCPxxgQQSm8n//1z+EMWeIVpXHrG11HQRlQw6Lwv8tnrJs9GbXsfiNRtd7DSQ2/Kbhixv8yUuU0xymlNB6ST6Ue+qinuZ+WZr7MB8cpJoDRQ73suTa27qwmPIbNfUOcuKzwS0KVegHLo3fdv/mKDujJ9pM=
+    on_success: change
+    on_failure: always
