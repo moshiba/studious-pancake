@@ -22,40 +22,39 @@ def df_factory():
         os.remove(df_path + "test")
 
 
-def test_update_grouping(df_factory):
-    df = df_factory("grouping")
-    assert len(df.groups) == 15
-    for i in range(15):
-        assert len(df.groups[i]) == 1
-        assert df.groups[i][0] == 'g' + str(i + 1) + '\n'
+class TestBasicOperations:
+    def test_update_grouping(self, df_factory):
+        df = df_factory("grouping")
+        assert len(df.groups) == 15
+        for i in range(15):
+            assert len(df.groups[i]) == 1
+            assert df.groups[i][0] == 'g' + str(i + 1) + '\n'
 
+    def test_writeback_clear(self, df_factory):
+        df = df_factory("writeback")
+        for i in range(len(df.groups)):
+            df.groups[i] = ['']
+        df._DataFile__writeback()
+        with open(df.filename, 'r') as f:
+            assert all(map((lambda x: x == '\n'), f.readlines()))
 
-def test_writeback_clear(df_factory):
-    df = df_factory("writeback")
-    for i in range(len(df.groups)):
-        df.groups[i] = ['']
-    df._DataFile__writeback()
-    with open(df.filename, 'r') as f:
-        assert all(map((lambda x: x == '\n'), f.readlines()))
-
-
-def test_writeback_alter(df_factory):
-    df = df_factory("writeback")
-    for i in range(len(df.groups)):  # 15 groups
-        if i % 2 == 1:
-            df.groups[i] = ['test even\n']
-        elif i % 2 == 0:
-            df.groups[i] = ['test odd\n']
-    df._DataFile__writeback()
-    with open(df.filename, 'r') as f:
-        lines = f.readlines()
-        for i in range(30):
-            if i % 4 == 0:
-                assert lines[i] == "test odd\n"
-            elif i % 4 == 2:
-                assert lines[i] == "test even\n"
-            else:
-                assert lines[i] == "\n"
+    def test_writeback_alter(self, df_factory):
+        df = df_factory("writeback")
+        for i in range(len(df.groups)):  # 15 groups
+            if i % 2 == 1:
+                df.groups[i] = ['test even\n']
+            elif i % 2 == 0:
+                df.groups[i] = ['test odd\n']
+        df._DataFile__writeback()
+        with open(df.filename, 'r') as f:
+            lines = f.readlines()
+            for i in range(30):
+                if i % 4 == 0:
+                    assert lines[i] == "test odd\n"
+                elif i % 4 == 2:
+                    assert lines[i] == "test even\n"
+                else:
+                    assert lines[i] == "\n"
 
 
 class TestProperties:
@@ -167,61 +166,59 @@ class TestProperties:
             assert df.groups[14][i] == f"{2*(i+27)}\n"
 
 
-def test_deleteBond_succeed(df_factory):
-    df = df_factory("bondDel")
-    assert df.nbonds == 20
-    df.deleteBond(1)
-    assert df.nbonds == 19
+class TestBondOperations:
+    def test_deleteBond_succeed(self, df_factory):
+        df = df_factory("bondDel")
+        assert df.nbonds == 20
+        df.deleteBond(1)
+        assert df.nbonds == 19
 
-    f = DataFile(df.filename)
-    assert f.nbonds == 19
-    assert "1 1 1 489\n" not in f.groups[14]
+        f = DataFile(df.filename)
+        assert f.nbonds == 19
+        assert "1 1 1 489\n" not in f.groups[14]
 
+    def test_deleteBond_fail(self, df_factory):
+        df = df_factory("bondDel")
+        assert df.nbonds == 20
+        with pytest.raises(DataFile.BondNotFoundError) as e:
+            df.deleteBond(2000)
 
-def test_deleteBond_fail(df_factory):
-    df = df_factory("bondDel")
-    assert df.nbonds == 20
-    with pytest.raises(DataFile.BondNotFoundError) as e:
-        df.deleteBond(2000)
+        assert "bond index: 2000" == str(e.value)
+        assert df.nbonds == 20
 
-    assert "bond index: 2000" == str(e.value)
-    assert df.nbonds == 20
+        f = DataFile(df.filename)
+        assert f.nbonds == 20
 
-    f = DataFile(df.filename)
-    assert f.nbonds == 20
+    def test_addBond_succeed(self, df_factory):
+        df = df_factory("bondAdd")
+        assert df.nbonds == 17
+        df.addBond("2 1 1 481\n")
+        assert df.nbonds == 18
 
+        f = DataFile(df.filename)
+        assert "2 1 1 481\n" in f.groups[14]
+        assert f.nbonds == 18
 
-def test_addBond_succeed(df_factory):
-    df = df_factory("bondAdd")
-    assert df.nbonds == 17
-    df.addBond("2 1 1 481\n")
-    assert df.nbonds == 18
+    def test_addBond_fail(self, df_factory):
+        df = df_factory("bondAdd")
+        assert df.nbonds == 17
+        with pytest.raises(DataFile.BondAlreadyExistsError) as e:
+            df.addBond("1 1 1 489\n")
 
-    f = DataFile(df.filename)
-    assert "2 1 1 481\n" in f.groups[14]
-    assert f.nbonds == 18
+        assert "bond: 1 1 1 489\n" == str(e.value)
+        assert df.nbonds == 17
 
-
-def test_addBond_fail(df_factory):
-    df = df_factory("bondAdd")
-    assert df.nbonds == 17
-    with pytest.raises(DataFile.BondAlreadyExistsError) as e:
-        df.addBond("1 1 1 489\n")
-
-    assert "bond: 1 1 1 489\n" == str(e.value)
-    assert df.nbonds == 17
-
-    f = DataFile(df.filename)
-    assert f.nbonds == 17
+        f = DataFile(df.filename)
+        assert f.nbonds == 17
 
 
-def test_deleteAtom(df_factory):
-    df = df_factory("grouping")
-    with pytest.raises(NotImplementedError):
-        df.deleteAtom(10)
+class TestAtomOperations:
+    def test_deleteAtom(self, df_factory):
+        df = df_factory("grouping")
+        with pytest.raises(NotImplementedError):
+            df.deleteAtom(10)
 
-
-def test_recoverAtom(df_factory):
-    df = df_factory("grouping")
-    with pytest.raises(NotImplementedError):
-        df.addAtom("not impl")
+    def test_recoverAtom(self, df_factory):
+        df = df_factory("grouping")
+        with pytest.raises(NotImplementedError):
+            df.addAtom("not impl")
