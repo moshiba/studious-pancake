@@ -37,6 +37,7 @@ class DataFile:
                 for line in g:
                     f.write(line)
                 f.write("\n")
+            f.flush()
 
     def deleteBond(self, bond_id: int) -> str:
         """
