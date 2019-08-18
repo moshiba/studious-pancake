@@ -6,10 +6,11 @@ from gonko.fileio import DataFile
 
 @pytest.fixture(scope="function")
 def df_factory():
+    data_dir = "tests/data/DataFile/"
     created_records = set()
 
     def _df_factory(name):
-        df_path = "tests/data/" + name + ".datafile."
+        df_path = data_dir + name + ".datafile."
         shutil.copy(df_path + "ORIG", df_path + "test")
         created_records.add(name)
         return DataFile(df_path + "test")
@@ -18,7 +19,7 @@ def df_factory():
 
     for record in created_records:
         print(f"teardown df: {record}")
-        df_path = "tests/data/" + record + ".datafile."
+        df_path = data_dir + record + ".datafile."
         os.remove(df_path + "test")
 
 
