@@ -203,8 +203,9 @@ class DataFile:
 
 
 class ScriptFile:
-    def __init__(self, filename):
+    def __init__(self, filename, library):
         self.filename = filename
+        self.library = library
 
     def run():
         pass
