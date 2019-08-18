@@ -215,10 +215,19 @@ def test_deleteBond_fail(bondDel_df):
     assert r"bond index: 2000" == str(e.value)
 
 
-def test_addBond(bondAdd_df):
-    # self.Bonds = self.groups[14]
+def test_addBond_succeed(bondAdd_df):
     df = bondAdd_df
-    pass
+    df.addBond("2 1 1 481\n")
+
+    f = DataFile(df.filename)
+    assert "2 1 1 481\n" in f.groups[14]
+
+
+def test_addBond_fail(bondAdd_df):
+    df = bondAdd_df
+    with pytest.raises(DataFile.BondAlreadyExistsError) as e:
+        df.addBond("2 1 1 481\n")
+    assert r"bond index: 2" == str(e.value)
 
 
 def test_deleteAtom(grouping_df):
