@@ -158,7 +158,7 @@ class TestProperties:
             assert df.groups[12][i] == f"{2*(i+27)}\n"
 
     def test_Bonds(self, df_factory):
-        df = ("properties")
+        df = df_factory("properties")
         assert df.groups[14] == ["g15\n"]
         assert df.Bonds == ["g15\n"]
 
