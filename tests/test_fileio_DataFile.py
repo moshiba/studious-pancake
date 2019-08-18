@@ -5,20 +5,21 @@ from gonko.fileio import DataFile
 
 
 @pytest.fixture(scope="function")
-def df():
+def df_handler():
     created_records = set()
 
-    def _df(name):
+    def _df_handler(name):
         df_path = "tests/data/" + name + ".datafile."
         shutil.copy(df_path + "ORIG", df_path + "test")
         created_records.add(name)
         return DataFile(df_path + "test")
 
+    yield _df_handler
+
     for record in created_records:
         print(f"teardown df: {record}")
         os.remove(df_path + "test")
         
-
 
 @pytest.fixture(scope="function")
 def grouping_df():
@@ -70,8 +71,8 @@ def properties_df():
     os.remove(df_path + "test")
 
 
-def test_update_grouping(grouping_df):
-    df = grouping_df
+def test_update_grouping(df_handler):
+    df = df_handler("grouping")
     assert len(df.groups) == 15
     for i in range(15):
         assert len(df.groups[i]) == 1
