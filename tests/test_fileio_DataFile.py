@@ -199,10 +199,20 @@ class TestProperties:
             assert df.groups[14][i] == f"{2*(i+27)}\n"
 
 
-def test_deleteBond(bondDel_df):
-    # self.Bonds = self.groups[14]
+def test_deleteBond_succeed(bondDel_df):
     df = bondDel_df
-    pass
+    df.deleteBond(1)
+
+    f = DataFile(df.filename)
+    assert "1 1 1 489\n" not in f.groups[14]
+
+
+def test_deleteBond_fail(bondDel_df):
+    df = bondDel_df
+    with pytest.raises(gonko.DataFile.BondNotFoundError) as e:
+        df.deleteBond(2000)
+
+    assert str(e.message) == r"bond index: 2000"
 
 
 def test_addBond(bondAdd_df):
