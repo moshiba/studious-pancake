@@ -18,6 +18,7 @@ def df_handler():
 
     for record in created_records:
         print(f"teardown df: {record}")
+        df_path = "tests/data/" + record + ".datafile."
         os.remove(df_path + "test")
         
 
