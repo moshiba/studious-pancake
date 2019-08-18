@@ -212,7 +212,7 @@ def test_deleteBond_fail(bondDel_df):
     with pytest.raises(DataFile.BondNotFoundError) as e:
         df.deleteBond(2000)
 
-    assert r"bond index: 2000" not in str(e.value)
+    assert r"bond index: 2000" == str(e.value)
 
 
 def test_addBond(bondAdd_df):
