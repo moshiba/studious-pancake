@@ -6,7 +6,7 @@ import shutil
 
 
 class lammps:
-    data_dir = "tests/data/ScriptOutput/"
+    file_dir = "tests/data/ScriptOutput/"
     created_records = set()
 
     def __init__(self, name=None, cmdargs=None, ptr=None, comm=None):
@@ -29,17 +29,25 @@ class lammps:
         """
         # @todo refactor the way mocking behavior
         # @body using context depending code is bad for maintainability
-        self.filename = file
-        df_path = lammps.data_dir + self.filename + ".t."
+        if "in.shear" in file:
+            self.outfile = "ShearModulusG.t"
+        # elif "in.spread" in file:
+        elif "in.uniaxial" in file:
+            self.outfile = "poissonRatioV.t"
+        else:
+            raise NotImplementedError(f"unknown output for {file}")
 
-        lammps.created_records.add(self.filename)
-        shutil.copy(df_path + "ORIG", df_path + "test")
+        target_path = lammps.file_dir + self.outfile
 
-    def CleanupMocks(self):
-        for record in lammps.created_records:
+        lammps.created_records.add(self.outfile)
+        shutil.copy(target_path + ".ORIG", target_path + ".test")
+
+    @classmethod
+    def CleanupMocks(cls):
+        for record in cls.created_records:
             print(f"teardown df: {record}")
-            df_path = lammps.data_dir + record + ".t."
-            os.remove(df_path + "test")
+            tg_path = cls.file_dir + record
+            os.remove(tg_path + ".test")
 
     def command(self, cmd):
         """
