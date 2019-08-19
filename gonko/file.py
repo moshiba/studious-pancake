@@ -207,8 +207,10 @@ class ScriptFile:
         self.filename = filename
         self.library = library
 
-    def run():
-        pass
+    def run(self):
+        lmp = self.library()
+        lmp.file(self.filename)
+        lmp.close()
 
 
 class ScriptOuput:
