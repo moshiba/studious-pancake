@@ -217,7 +217,6 @@ class ScriptOuput:
     def __init__(self, filename: str):
         self.filename = filename
 
-    @property
     def avg(self, low_bound: int, high_bound: int) -> float:
         # @todo add more warnings about inclusive/exclusive bound rules
         """ Average:
