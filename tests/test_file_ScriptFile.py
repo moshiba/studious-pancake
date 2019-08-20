@@ -33,7 +33,7 @@ def test_InitInstance_succeed(script_factory):
 
 
 def test_InitInstance_fail(script_factory):
-    with pytest.raises(FileNotFoundError) as e:
+    with pytest.raises(FileNotFoundError):
         _ = script_factory("dontexist")
 
 
@@ -41,4 +41,7 @@ def test_mock_run(script_factory):
     script = script_factory("shear")
     script.run()
     # expects nothing happens
+
+    # @todo check that the mocked output has been generated
+    # f = open(lammps.file_dir + file, 'r')
     lammps.CleanupMocks()
