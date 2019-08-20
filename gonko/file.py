@@ -1,12 +1,13 @@
-""" fileio
+""" file
 ------------
-helper functions for file I/O
+helper functions for files
 
 """
+import statistics
 import itertools
 
 
-class datafile:
+class DataFile:
     """
     represents a 'data.file'
     """
@@ -26,7 +27,7 @@ class datafile:
                 groups.append(list(g))  # Store group iterator as a list
                 uniquekeys.append(k)
         stripped = filter((lambda x: x[0] is False), zip(uniquekeys, groups))
-        self.groups = list(zip(*stripped))[1]
+        self.groups = list(list(zip(*stripped))[1])
 
         self.__latest = True  # lazy evaluation flag
 
@@ -36,9 +37,13 @@ class datafile:
                 for line in g:
                     f.write(line)
                 f.write("\n")
+            f.flush()
 
     def deleteBond(self, bond_id: int) -> str:
         """
+            parameter:
+                bond_id: index of the bond,
+                    * not the index of the array containing the 'Bonds' section
         """
         bond_id = str(bond_id)
         try:
@@ -52,7 +57,7 @@ class datafile:
             return popped
         except ValueError:
             # cannot find this bond
-            raise self.BoundNotFoundError()
+            raise self.BondNotFoundError(f"bond index: {bond_id}")
 
     def deleteAtom(self, atom_id: int) -> str:
         # @todo expect class to generalize someday
@@ -60,22 +65,26 @@ class datafile:
         """
         raise NotImplementedError
 
-    def recoverBond(self, bond: str):
+    def addBond(self, bond: str):
         """
         """
         try:
             assert bond not in self.Bonds
         except AssertionError:
-            raise self.BondAlreadyExistsError()
+            raise self.BondAlreadyExistsError(f"bond: {bond}")
 
         self.Bonds.append(bond)
-        self.Bonds.sort(key=(lambda x: int(x.split(' ')[0])))
+        assert bond in self.Bonds
+        assert bond in self.groups[14]
+        print(len(self.Bonds))
+        print(self.Bonds.index(bond))
+        # self.Bonds.sort(key=(lambda x: int(x.split(' ')[0])))  DEBUG
         self.set_nbonds(self.nbonds + 1)
 
         self.__writeback()
         self.file_changed()
 
-    def recoverAtom(self, atom: str):
+    def addAtom(self, atom: str):
         # @todo expect class to generalize someday
         """
         """
@@ -120,11 +129,19 @@ class datafile:
         """
         return self.groups[4]
 
+    @Masses.setter
+    def Masses(self, update: list):
+        self.groups[4] = update
+
     @property
     def PairCoeffs_soft(self):
         """
         """
         return self.groups[6]
+
+    @PairCoeffs_soft.setter
+    def PairCoeffs_soft(self, update: list):
+        self.groups[6] = update
 
     @property
     def BondCoeffs_harmonic(self):
@@ -132,11 +149,19 @@ class datafile:
         """
         return self.groups[8]
 
+    @BondCoeffs_harmonic.setter
+    def BondCoeffs_harmonic(self, update: list):
+        self.groups[8] = update
+
     @property
     def Atoms_molecular(self):
         """
         """
         return self.groups[10]
+
+    @Atoms_molecular.setter
+    def Atoms_molecular(self, update: list):
+        self.groups[10] = update
 
     @property
     def Velocities(self):
@@ -144,16 +169,24 @@ class datafile:
         """
         return self.groups[12]
 
+    @Velocities.setter
+    def Velocities(self, update: list):
+        self.groups[12] = update
+
     @property
     def Bonds(self):
         """
         """
         return self.groups[14]
 
+    @Bonds.setter
+    def Bonds(self, update: list):
+        self.groups[14] = update
+
     class NotFoundError(Exception):
         pass
 
-    class BoundNotFoundError(NotFoundError):
+    class BondNotFoundError(NotFoundError):
         pass
 
     class AtomNotFoundError(NotFoundError):
@@ -167,3 +200,50 @@ class datafile:
 
     class AtomAlreadyExistsError(AlreadyExistsError):
         pass
+
+
+class ScriptFile:
+    def __init__(self, filename, library):
+        self.filename = filename
+        self.library = library
+
+    def run(self):
+        lmp = self.library()
+        lmp.file(self.filename)
+        lmp.close()
+
+
+class ScriptOuput:
+    def __init__(self, filename: str):
+        self.filename = filename
+
+    def avg(self, low_bound: int, high_bound: int) -> float:
+        # @todo add more warnings about inclusive/exclusive bound rules
+        """ Average:
+
+        [ INCLUSIVE BOUND ]
+
+            parameters:
+                low_bound:  valid number low bound
+                high_bound: valid number high bound
+
+        opens a file,
+        retrieve designated lines according to the filter parameters,
+        returns the average value
+
+        """
+
+        with open(self.filename, "r") as f:
+            # read and ignore headers
+            f.readline()
+            f.readline()
+
+            def range_selector(x):  # dynamically defined filter
+                """ filter indexes of lines to be within designated range """
+                num = int(x.split(' ')[0])
+                return high_bound >= num and num >= low_bound
+
+            lines = filter(range_selector, f.readlines())
+            val_list = list(map((lambda x: float(x.split(' ')[1])), lines))
+            val = statistics.mean(val_list)
+            return val

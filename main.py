@@ -8,22 +8,36 @@ import statistics
 
 # Aquire some initial condition Z K
 print("Aquiring some initial condition eg. Z and K")
-with open("data.file", "r") as f:
-    f.readline()
-    f.readline()
-    natoms = int(f.readline().split()[0])
-    f.readline()
-    nbonds = int(f.readline().split()[0])
-print(f"natoms: {natoms}")
-print(f"nbonds: {nbonds}")
+datafile = utils.fileio.datafile("data.file")
+print(f"natoms: {datafile.natoms}")
+print(f"nbonds: {datafile.nbonds}")
 
 
 # for loading
 nbonds = 1372
 
-z = nbonds / natoms
+z = datafile.nbonds / datafile.natoms
 k = 2.5
 iter_num = itertools.count()
+
+
+def get_GV_val(mode: str) -> int:
+    if mode == "G":
+        filename = "ShearModulusG.t"
+    elif mode == "V":
+        filename = "poissonRatioV.t"
+    else:
+        raise Exception
+
+    with open(filename, "r") as f:  # ShearModulusG.t= G0
+        f.readline()
+        f.readline()
+        lines = filter((lambda x: int(x.split(' ')[0]) > 20000), f.readlines())
+        val_list = list(map((lambda x: float(x.split(' ')[1])), lines))
+        val = statistics.mean(val_list)
+        return val
+
+
 # Pruning the network until some kind of condition is met.
 print("#Pruning the network until some kind of condition is met.")
 while z >= k:
@@ -36,11 +50,7 @@ while z >= k:
 
     next(iter_num)
     print("Number of iteration: ", iter_num)
-    with open("ShearModulusG.t", "r") as f:  # ShearModulusG.t= G0
-        lines = f.readlines()[20000:100000]
-        MG_list = list(map((lambda x: x.split(' ')[1]), lines))
-        G0 = statistics.mean(MG_list)
-
+    G0 = get_GV_val('G')
     print("Initial G0 aqqired:", G0)
 
     # @todo LEGACY CODE
@@ -61,52 +71,44 @@ while z >= k:
     #    nbonds = len(store_bond)
 
     deltaG = []
-    G = []
-    temdeleted = " "
     #    print("nmber of bonds =",b)
     print("Deleting bonds...")
-    for i in range(nbonds):
-        temdeleted = utils.fileio.deleteBond("Bonds", str(i + 1))
-        print("tem =", temdeleted)
+    for idx in range(datafile.nbonds):
+        print("*"*20)
+        print("*"*20)
+        print(f"entering bond iteration: {idx}")
+        try:
+            print(f"temdeleted (previous) : {temdeleted}")
+        except:
+            pass
+        print("*"*20)
+        print("*"*20)
 
-        if temdeleted == "PASS":
-            G.append(math.inf)
-            deltaG.append(math.inf)
+        try:
+            temdeleted = datafile.deleteBond(idx + 1)
+            print("@"*30)
+            print("@"*30)
+            print("tem =", temdeleted)
+            print("@"*30)
+            print("@"*30)
+        except utils.fileio.datafile.BoundNotFoundError as e:
+            # Already deleted
             continue
 
-        else:
-            print("===========Obtaining Gi=============")
-            print("===========Gi test begings=============")
-            lmp = lammps()
-            lmp.file("in.shear")
-            lmp.close()
-            print("===========Gi test is completed=============")
+        print(f"===========Obtaining Gi=============")
+        print(f"===========Gi test begings=============")
+        lmp = lammps()
+        lmp.file("in.shear")
+        lmp.close()
+        print(f"===========Gi testd is completed=============")
+        tmp_G = get_GV_val('G')
+        deltaG.append((idx, tmp_G - G0))
+        # recover what was deleted in 'try'
+        print(f"about to try to recover bond: {temdeleted}")
+        datafile.recoverBond(temdeleted)
 
-            with open("ShearModulusG.t", "r") as f:  # ShearModulusG.t= Gi
-                store_MG = []
-                line = f.readline()
-                Sflag = False
-                while line:
-                    line = f.readline()
-
-                    if line.split(" ")[0] == "20000":
-                        Sflag = True
-                    if line.split(" ")[0] == "100000":
-                        Sflag = False
-                    if Sflag:
-                        store = line.split(" ")[1]
-                        store_MG.append(float(store[:-1]))
-
-            total_G = 0
-            for m in range(len(store_MG)):
-                total_G += store_MG[m]
-            G.append(total_G / len(store_MG))
-            deltaG.append(G[i] - G0)
-
-        utils.fileio.recoverBond(temdeleted)
-
-    utils.fileio.deleteBond("Bonds", str(deltaG.index(min(deltaG)) +
-                                       1))  # = lowest deltaGi
+    tmp_idx, min_G = min(deltaG, key=(lambda x: x[0]))
+    datafile.deleteBond(idx + 1)  # = lowest deltaGi
 
     print("Bonds deleted.")
 
@@ -115,46 +117,20 @@ while z >= k:
     lmp.file("in.uniaxial")
     lmp.close()
     print("===========V test is completed=============")
-    with open("poissonRatioV.t", "r") as f:  # S poissonRatioV.t = V
-        store_MV = []
-        line = f.readline()
-        Vflag = False
-        while line:
-            line = f.readline()
-
-            if line.split(" ")[0] == "20000":
-                Vflag = True
-            if line.split(" ")[0] == "100000":
-                Vflag = False
-            if Vflag:
-                store = line.split(" ")[1]
-                store_MV.append(float(store[:-1]))
-
-    total_V = 0
-    for m in range(len(store_MV)):
-        total_V += store_MV[m]
-    V = total_V / len(store_MV)
+    V = get_GV_val('V')
     print("Iteration is completed.")
 
     if not os.path.isdir('./checkpoint'):
         os.mkdir('./checkpoint')
 
-    with open("data.file", "r") as f:
-        lines = f.readlines()
-        for i in range(len(lines)):
-            if i == 2:
-                a = int(lines[i].split(" ")[0])
-            if i == 4:
-                b = int(lines[i].split(" ")[0])
-                break
+    z = datafile.nbonds / datafile.natoms
 
-    z = b / a
+    # @todo check with designer to see if we need checkpoints
+    # with open("./checkpoint/data_v{}_z{}.file".format(V, z), "w+") as f:
+    #     for line in lines:
+    #         f.write(line)
 
-    with open("./checkpoint/data_v{}_z{}.file".format(V, z), "w+") as f:
-        for line in lines:
-            f.write(line)
-
-    print("Data saved at ./checkpoint")
+    # print("Data saved at ./checkpoint")
     # copydata then save data in another folder
 
 print("Pruing process finished.")
