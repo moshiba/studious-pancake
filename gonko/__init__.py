@@ -1,2 +1,2 @@
-__all__ = ["fileio"]
-from . import fileio
+__all__ = ["file"]
+from . import file

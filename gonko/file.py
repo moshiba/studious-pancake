@@ -1,6 +1,6 @@
-""" fileio
+""" file
 ------------
-helper functions for file I/O
+helper functions for files
 
 """
 import statistics
@@ -203,27 +203,25 @@ class DataFile:
 
 
 class ScriptFile:
-    def __init__(self, filename):
+    def __init__(self, filename, library):
         self.filename = filename
+        self.library = library
 
-
-class ShearScript(ScriptFile):
-    def __init__(self, filename):
-        super().__init__(filename)
-
-
-class UniaxialScript(ScriptFile):
-    def __init__(self, filename):
-        super().__init__(filename)
+    def run(self):
+        lmp = self.library()
+        lmp.file(self.filename)
+        lmp.close()
 
 
 class ScriptOuput:
-    def __init__(self, filename):
+    def __init__(self, filename: str):
         self.filename = filename
 
-    @property
-    def avg(self, low_bound, high_bound) -> float:
+    def avg(self, low_bound: int, high_bound: int) -> float:
+        # @todo add more warnings about inclusive/exclusive bound rules
         """ Average:
+
+        [ INCLUSIVE BOUND ]
 
             parameters:
                 low_bound:  valid number low bound
@@ -243,21 +241,9 @@ class ScriptOuput:
             def range_selector(x):  # dynamically defined filter
                 """ filter indexes of lines to be within designated range """
                 num = int(x.split(' ')[0])
-                return high_bound > num and num > low_bound
+                return high_bound >= num and num >= low_bound
 
             lines = filter(range_selector, f.readlines())
             val_list = list(map((lambda x: float(x.split(' ')[1])), lines))
             val = statistics.mean(val_list)
             return val
-
-
-class ShearOutput(ScriptOuput):
-    def __init__(self, filename):
-        assert filename == "ShearModulusG.t"
-        super().__init__(filename)
-
-
-class UniaxialOutput(ScriptOuput):
-    def __init__(self, filename):
-        assert filename == "poissonRatioV.t"
-        super().__init__(filename)
