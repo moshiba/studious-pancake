@@ -219,7 +219,10 @@ class ScriptOuput:
 
     @property
     def avg(self, low_bound: int, high_bound: int) -> float:
+        # @todo add more warnings about inclusive/exclusive bound rules
         """ Average:
+
+        [ INCLUSIVE BOUND ]
 
             parameters:
                 low_bound:  valid number low bound
@@ -239,7 +242,7 @@ class ScriptOuput:
             def range_selector(x):  # dynamically defined filter
                 """ filter indexes of lines to be within designated range """
                 num = int(x.split(' ')[0])
-                return high_bound > num and num > low_bound
+                return high_bound >= num and num >= low_bound
 
             lines = filter(range_selector, f.readlines())
             val_list = list(map((lambda x: float(x.split(' ')[1])), lines))
