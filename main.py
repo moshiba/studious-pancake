@@ -49,7 +49,11 @@ while z >= k:
 
     deltaG = []
     # print("number of bonds =", b)
-    print("Deleting bonds...")
+    yell("  agh   ")
+    yell("  agh   ")
+    yell("Deleting bonds...")
+    yell("  agh   ")
+    yell("  agh   ")
     tmp_nbond = datafile.nbonds + 1
     for idx in range(1, tmp_nbond):
         yell(f"entering bond iteration: {idx}")
