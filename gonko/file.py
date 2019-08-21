@@ -58,6 +58,9 @@ class DataFile:
         except ValueError:
             # cannot find this bond
             raise self.BondNotFoundError(f"bond index: {bond_id}")
+        
+        # @todo remove this after solving issue 9
+        self.__update()
 
     def deleteAtom(self, atom_id: int) -> str:
         # @todo expect class to generalize someday
@@ -83,6 +86,8 @@ class DataFile:
 
         self.__writeback()
         self.file_changed()
+        # @todo remove this after solving issue 9
+        self.__update()
 
     def addAtom(self, atom: str):
         # @todo expect class to generalize someday
