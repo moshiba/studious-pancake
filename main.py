@@ -8,7 +8,7 @@ import statistics
 
 # Aquire some initial condition Z K
 print("Aquiring some initial condition eg. Z and K")
-datafile = gonko.file.datafile("data.file")
+datafile = gonko.file.DataFile("data.file")
 print(f"natoms: {datafile.natoms}")
 print(f"nbonds: {datafile.nbonds}")
 
