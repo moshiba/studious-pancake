@@ -55,7 +55,12 @@ while z >= k:
         yell(f"entering bond iteration: {idx}")
 
         try:
+            if idx == 2:
+                assert "2 1 1 481\n" in datafile.Bonds
             temdeleted = datafile.deleteBond(idx)
+            yell(f"I've just deleted bond: {temdeleted} in round: {idx}")
+            if idx == 2:
+                assert "2 1 1 481\n" not in datafile.Bonds
             yell(f"tem = {temdeleted}")
         except gonko.file.DataFile.BoundNotFoundError:
             # Already deleted
