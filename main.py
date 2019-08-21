@@ -66,7 +66,7 @@ while z >= k:
             if idx == 2:
                 assert "2 1 1 481\n" not in datafile.Bonds
             yell(f"tem = {temdeleted}")
-        except gonko.file.DataFile.BoundNotFoundError:
+        except gonko.file.DataFile.BondNotFoundError:
             # Already deleted
             continue
 
