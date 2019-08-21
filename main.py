@@ -68,7 +68,8 @@ while z >= k:
         tmp_G = gonko.file.ScriptOuput("ShearModulusG.t").avg(2000, 10000)
         deltaG.append((idx, tmp_G - G0))
         # recover what was deleted in 'try'
-        print(f"about to try to recover bond: {temdeleted}")
+        yell(f"about to try to recover bond: {temdeleted}")
+        yell(f"loop counter (from 1): {idx}")
         datafile.addBond(temdeleted)
 
     tmp_idx, min_G = min(deltaG, key=(lambda x: x[0]))
