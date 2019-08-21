@@ -39,7 +39,7 @@ print("#Pruning the network until some kind of condition is met.")
 while z >= k:
     anounce("Obtaining G0")
     anounce("G0 test begins")
-    gonko.file.ScriptFile("gonko/scripts/in.shear").run()
+    gonko.file.ScriptFile("gonko/scripts/in.shear", lammps).run()
     anounce("G0 test is completed")
 
     print("Number of iteration: ", next(iter_num))
@@ -63,7 +63,7 @@ while z >= k:
 
         anounce(f"Obtaining Gi")
         anounce(f"Gi test begings")
-        gonko.file.ScriptFile("gonko/scripts/in.shear").run()
+        gonko.file.ScriptFile("gonko/scripts/in.shear", lammps).run()
         anounce(f"Gi testd is completed")
         tmp_G = gonko.file.ScriptOuput("ShearModulusG.t").avg(2000, 10000)
         deltaG.append((idx, tmp_G - G0))
@@ -76,7 +76,7 @@ while z >= k:
     print("Bonds deleted.")
 
     print("Calculating V of the sample of this iteration.")
-    V = gonko.file.ScriptFile("gonko/scripts/in.uniaxial").run()
+    V = gonko.file.ScriptFile("gonko/scripts/in.uniaxial", lammps).run()
     anounce("V test is completed")
 
     V = gonko.file.ScriptOuput("poissonRatioV.t").avg(2000, 10000)
