@@ -56,7 +56,7 @@ while z >= k:
 
         try:
             temdeleted = datafile.deleteBond(idx)
-            yell("tem =", temdeleted)
+            yell(f"tem = {temdeleted}")
         except gonko.file.datafile.BoundNotFoundError:
             # Already deleted
             continue
