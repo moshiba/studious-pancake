@@ -15,7 +15,7 @@ print(f"nbonds: {datafile.nbonds}")
 
 def anounce(string: str, level: int = 12):
     print("=" * level, end='')
-    print(string, end='')
+    print(string.strip('\n'), end='')
     print("=" * level)
 
 
@@ -25,7 +25,7 @@ def yell(string: str, width: int = 40):
     print("=" * width)
     i = len(string) % 2
     wing = (width - len(string) - 8) // 2
-    print("== " + " " * wing, string, " " * (wing+i) + " ==")
+    print("== " + " " * wing, string.strip('\n'), " " * (wing+i) + " ==")
     print("=" * width)
 
 
