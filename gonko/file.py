@@ -107,7 +107,8 @@ class DataFile:
         # @todo rename this for better clarity
         """ returns the number of atoms as integer
         """
-        self.__update()
+        if not self.is_latest:
+            self.__update()
         return int(self.groups[1][0].split(' ')[0])
 
     def set_natoms(self, num: int):
@@ -119,7 +120,8 @@ class DataFile:
         # @todo rename this for better clarity
         """ returns the number of bonds as integer
         """
-        self.__update()
+        if not self.is_latest:
+            self.__update()
         return int(self.groups[1][2].split(' ')[0])
 
     def set_nbonds(self, num: int):
