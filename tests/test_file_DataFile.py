@@ -42,10 +42,10 @@ class TestBasicOperations:
     def test_writeback_alter(self, df_factory):
         df = df_factory("writeback")
         for i in range(len(df.groups)):  # 15 groups
-            if i % 2 == 1:
-                df.groups[i] = ['test even\n']
-            elif i % 2 == 0:
+            if i % 2 == 0:
                 df.groups[i] = ['test odd\n']
+            elif i % 2 == 1:
+                df.groups[i] = ['test even\n']
         df._DataFile__writeback()
         with open(df.filename, 'r') as f:
             lines = f.readlines()
@@ -159,18 +159,15 @@ class TestBondOperations:
 
         assert df.nbonds == 20
 
-        # EXPECT TO SUCCEED
-        df.deleteBond(1)
-        # internal check
+        db = df.deleteBond(1)
+        assert db == "1 1 1 489\n"
         assert df.nbonds == 19
+
         assert "1 1 1 489\n" not in df.Bonds
-        # external check
         f = DataFile(df.filename)
         assert f.nbonds == 19
         assert "1 1 1 489\n" not in f.groups[14]
         del f
-
-        # EXPECT TO FAIL
         with pytest.raises(DataFile.BondNotFoundError) as e:
             df.deleteBond(1)
         assert "bond index: 1" == str(e.value)
@@ -178,13 +175,16 @@ class TestBondOperations:
 
         # EXPECT TO SUCCEED
         df.deleteBond(2)
-        # internal check
         assert df.nbonds == 18
         assert "2 1 1 481\n" not in df.Bonds
-        # external check
         f = DataFile(df.filename)
         assert f.nbonds == 18
         assert "2 1 1 481\n" not in f.groups[14]
+        del f
+        with pytest.raises(DataFile.BondNotFoundError) as e:
+            df.deleteBond(2)
+        assert "bond index: 2" == str(e.value)
+        assert df.nbonds == 18
 
     def test_deleteBond_fail(self, df_factory):
         df = df_factory("bondDel")
