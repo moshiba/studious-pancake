@@ -84,7 +84,6 @@ while z >= k:
     if not os.path.isdir('./checkpoint'):
         os.mkdir('./checkpoint')
 
-
     shutil.copy("data.file", f"./checkpoint/data_v{V}_z{z}.file")
     print("Data saved at ./checkpoint")
 
