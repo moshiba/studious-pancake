@@ -4,6 +4,7 @@ import os
 import math
 import itertools
 import statistics
+import shutil
 
 
 # Aquire some initial condition Z K
@@ -37,72 +38,55 @@ iter_num = itertools.count()  # while loop iteration counter
 # Pruning the network until some kind of condition is met.
 print("#Pruning the network until some kind of condition is met.")
 while z >= k:
-    announce("G0 test begins")
+    announce(f"Obtaining G0")
     gonko.file.ScriptFile("gonko/scripts/in.shear", lammps).run()
-    announce("G0 test is completed")
+    announce(f"G0 test is completed")
 
-    print("Number of iteration: ", next(iter_num))
+    yell(f"Number of iteration: {next(iter_num)}")
 
     G0 = gonko.file.ScriptOuput("ShearModulusG.t").avg(2000, 10000)
-    print("Initial G0 aqqired:", G0)
+    announce(f"Initial G0 aqqired: {G0}")
 
     deltaG = []
-    # print("number of bonds =", b)
-    yell("  agh   ")
-    yell("  agh   ")
-    yell("Deleting bonds...")
-    yell("  agh   ")
-    yell("  agh   ")
-    tmp_nbond = datafile.nbonds + 1
-    for idx in range(1, tmp_nbond):
-        yell(f"entering bond iteration: {idx}")
 
+    announce(f"number of bonds = {datafile.nbonds}")
+    yell(f"Deleting bonds...")
+    for idx in range(1, datafile.nbonds + 1):
+        announce(f"entering bond iteration: {idx}")
         try:
-            if idx == 2:
-                assert "2 1 1 481\n" in datafile.Bonds
             temdeleted = datafile.deleteBond(idx)
-            yell(f"I've just deleted bond: {temdeleted} in round: {idx}")
-            if idx == 2:
-                assert "2 1 1 481\n" not in datafile.Bonds
-            yell(f"tem = {temdeleted}")
         except gonko.file.DataFile.BondNotFoundError:
             # Already deleted
             continue
 
         announce(f"Obtaining Gi")
-        announce(f"Gi test begings")
         gonko.file.ScriptFile("gonko/scripts/in.shear", lammps).run()
-        announce(f"Gi testd is completed")
+        announce(f"Gi test is completed")
+
         tmp_G = gonko.file.ScriptOuput("ShearModulusG.t").avg(2000, 10000)
         deltaG.append((idx, tmp_G - G0))
         # recover what was deleted in 'try'
-        yell(f"about to try to recover bond: {temdeleted}")
-        yell(f"loop counter (from 1): {idx}")
         datafile.addBond(temdeleted)
 
-    tmp_idx, min_G = min(deltaG, key=(lambda x: x[0]))
+    tmp_idx, min_dG = min(deltaG, key=(lambda x: x[1]))
     datafile.deleteBond(idx)  # = lowest deltaGi
-    print("Bonds deleted.")
+    yell(f"Bond with lowest deltaG: {tmp_idx}(delta: {min_dG}) deleted")
 
-    print("Calculating V of the sample of this iteration.")
+    announce(f"Calculating V of the sample of this iteration.")
     V = gonko.file.ScriptFile("gonko/scripts/in.uniaxial", lammps).run()
-    announce("V test is completed")
+    announce(f"V test is completed")
 
     V = gonko.file.ScriptOuput("poissonRatioV.t").avg(2000, 10000)
-    print("Iteration is completed.")
+    announce(f"Iteration is completed.")
+
+    z = datafile.nbonds / datafile.natoms
 
     if not os.path.isdir('./checkpoint'):
         os.mkdir('./checkpoint')
 
-    z = datafile.nbonds / datafile.natoms
 
-    # @todo check with designer to see if we need checkpoints
-    # with open("./checkpoint/data_v{}_z{}.file".format(V, z), "w+") as f:
-    #     for line in lines:
-    #         f.write(line)
+    shutil.copy("data.file", f"./checkpoint/data_v{V}_z{z}.file")
+    print("Data saved at ./checkpoint")
 
-    # print("Data saved at ./checkpoint")
-    # copydata then save data in another folder
-
-print("Pruing process finished.")
+announce(f"Pruing process finished.")
 # print("The final poisson ratio is =", V)
