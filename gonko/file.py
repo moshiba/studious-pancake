@@ -213,8 +213,14 @@ class ScriptFile:
         self.filename = filename
         self.library = library
 
-    def run(self):
-        lmp = self.library()
+    def run(self,
+            data_in: str = "data.file",
+            data_out: str = "out.t",
+            screen_out: str = "none"):
+        lmp = self.library(cmdargs=[
+            "-screen", f"{screen_out}", "-var", "gonko_data_in", f"{data_in}",
+            "-var", "gonko_data_out", f"{data_out}"
+        ])
         lmp.file(self.filename)
         lmp.close()
 

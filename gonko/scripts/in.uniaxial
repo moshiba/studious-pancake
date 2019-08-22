@@ -10,7 +10,7 @@ neigh_modify    every 1 delay 0 check yes
 pair_style soft      1.0
 bond_style harmonic
 
-read_data data.file
+read_data ${gonko_data_in}
 
 
 fix 1 all npt temp 1.0 1.0 1 iso 1.0 1.0 1 flip no 
@@ -52,7 +52,7 @@ variable p4 equal "-pzz/10000"
 
 #save stress not work
 #fix savestress all ave/time 1 2000 2000 _poisson v_strainy v_strainx temp v_p2 v_p3 v_p4 ke pe press file stress.t
-fix savestress all ave/time 1 100 100 v_poisson file poissonRatioV.t
+fix savestress all ave/time 1 100 100 v_poisson file ${gonko_data_out}
 #shell mkdir ./dataset
 #shell mkdir ./dump
 

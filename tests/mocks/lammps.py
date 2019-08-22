@@ -14,7 +14,7 @@ class lammps:
         create a LAMMPS object using the default liblammps.so library
         4 optional args are allowed: name, cmdargs, ptr, comm
         """
-        if any(map((lambda x: x is not None), [name, cmdargs, ptr, comm])):
+        if any(map((lambda x: x is not None), [name, ptr, comm])):
             raise NotImplementedError("optional args are not yet mocked")
 
     def close(self):

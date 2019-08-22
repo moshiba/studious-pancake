@@ -13,7 +13,7 @@ neigh_modify    every 1 delay 0 check yes
 pair_style soft      1.0
 bond_style harmonic
 
-read_data data.file
+read_data ${gonko_data_in}
 
 
 fix 1 all npt temp 1.0 1.0 1 iso 1.0 1.0 1 flip no 
@@ -50,7 +50,7 @@ variable shearStrain equal "xy/v_L0y+1e-10"
 variable shearStress equal "-pxy/10000"   
 variable ShearModulusG equal "v_shearStress/v_shearStrain"                                                                            
  
-fix savestress all ave/time 1 100 100 v_ShearModulusG  file ShearModulusG.t
+fix savestress all ave/time 1 100 100 v_ShearModulusG  file ${gonko_data_out}
 #save stress not work
 #fix savestress all ave/time 1 2000 2000 _poisson v_strainy v_strainx temp v_p2 v_p3 v_p4 ke pe press file stress.t
 
