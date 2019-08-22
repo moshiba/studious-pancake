@@ -1,6 +1,9 @@
 # vscode configs
 settings.json
 
+# LAMMPS logs
+**/log.lammps
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
