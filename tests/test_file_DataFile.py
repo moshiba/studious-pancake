@@ -42,14 +42,14 @@ class TestBasicOperations:
     def test_writeback_alter(self, df_factory):
         df = df_factory("writeback")
         for i in range(len(df.groups)):  # 15 groups
-            if i % 2 == 1:
-                df.groups[i] = ['test even\n']
-            elif i % 2 == 0:
+            if i % 2 == 0:
                 df.groups[i] = ['test odd\n']
+            elif i % 2 == 1:
+                df.groups[i] = ['test even\n']
         df._DataFile__writeback()
         with open(df.filename, 'r') as f:
             lines = f.readlines()
-            for i in range(30):
+            for i in range(29):
                 if i % 4 == 0:
                     assert lines[i] == "test odd\n"
                 elif i % 4 == 2:
@@ -59,34 +59,18 @@ class TestBasicOperations:
 
 
 class TestProperties:
-    def test_is_latest(self, df_factory):
-        df = df_factory("grouping")
-        assert df.is_latest is True
-        assert df._DataFile__latest == df.is_latest
-
-        df._DataFile__latest = False
-        assert df.is_latest is False
-
-        df._DataFile__latest = True
-        assert df.is_latest is True
-
-    def test_file_changed(self, df_factory):
-        df = df_factory("grouping")
-        assert df._DataFile__latest is True
-
-        df.file_changed()
-        assert df._DataFile__latest is False
-
     def test_natoms(self, df_factory):
         df = df_factory("properties")
         assert df.natoms == 459
 
+        # without writeback
         df.groups[1][0] = "123 atoms\n"
-        assert df.is_latest is True
-        assert df.natoms == 123
-
-        df.file_changed()
         assert df.natoms == 459
+        # alternation overwritten when property 'natoms' updated the object
+
+        df.groups[1][0] = "123 atoms\n"
+        df._DataFile__writeback()
+        assert df.natoms == 123
 
     def test_set_natoms(self, df_factory):
         df = df_factory("properties")
@@ -98,12 +82,14 @@ class TestProperties:
         df = df_factory("properties")
         assert df.nbonds == 1356
 
+        # without writeback
         df.groups[1][2] = "246 bonds\n"
-        assert df.is_latest is True
-        assert df.nbonds == 246
-
-        df.file_changed()
         assert df.nbonds == 1356
+        # alternation overwritten when property 'nbonds' updated the object
+
+        df.groups[1][2] = "246 bonds\n"
+        df._DataFile__writeback()
+        assert df.nbonds == 246
 
     def test_set_nbonds(self, df_factory):
         df = df_factory("properties")
@@ -170,13 +156,35 @@ class TestProperties:
 class TestBondOperations:
     def test_deleteBond_succeed(self, df_factory):
         df = df_factory("bondDel")
+
         assert df.nbonds == 20
-        df.deleteBond(1)
+
+        db = df.deleteBond(1)
+        assert db == "1 1 1 489\n"
         assert df.nbonds == 19
 
+        assert "1 1 1 489\n" not in df.Bonds
         f = DataFile(df.filename)
         assert f.nbonds == 19
         assert "1 1 1 489\n" not in f.groups[14]
+        del f
+        with pytest.raises(DataFile.BondNotFoundError) as e:
+            df.deleteBond(1)
+        assert "bond index: 1" == str(e.value)
+        assert df.nbonds == 19
+
+        # EXPECT TO SUCCEED
+        df.deleteBond(2)
+        assert df.nbonds == 18
+        assert "2 1 1 481\n" not in df.Bonds
+        f = DataFile(df.filename)
+        assert f.nbonds == 18
+        assert "2 1 1 481\n" not in f.groups[14]
+        del f
+        with pytest.raises(DataFile.BondNotFoundError) as e:
+            df.deleteBond(2)
+        assert "bond index: 2" == str(e.value)
+        assert df.nbonds == 18
 
     def test_deleteBond_fail(self, df_factory):
         df = df_factory("bondDel")

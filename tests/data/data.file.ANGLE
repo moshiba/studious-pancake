@@ -4,6 +4,8 @@ LAMMPS data file via write_data, version 18 Jun 2019, timestep = 0
 1 atom types
 1372 bonds
 1 bond types
+0 angles
+1 angle types
 
 -1.0000000000000000e+01 1.0000000000000000e+01 xlo xhi
 -1.0000000000000000e+01 1.0000000000000000e+01 ylo yhi
@@ -19,6 +21,10 @@ Pair Coeffs # soft
 1 10
 
 Bond Coeffs # harmonic
+
+1 1 1
+
+Angle Coeffs # harmonic
 
 1 1 1
 

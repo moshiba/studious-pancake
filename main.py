@@ -1,137 +1,91 @@
-import utils
+import gonko
 from lammps import lammps
 import os
 import math
 import itertools
 import statistics
+import shutil
 
 
 # Aquire some initial condition Z K
 print("Aquiring some initial condition eg. Z and K")
-datafile = utils.fileio.datafile("data.file")
+datafile = gonko.file.DataFile("data.file")
 print(f"natoms: {datafile.natoms}")
 print(f"nbonds: {datafile.nbonds}")
 
 
-# for loading
-nbonds = 1372
+def announce(string: str, level: int = 12):
+    print("=" * level, end='')
+    print(string.strip('\n'), end='')
+    print("=" * level)
+
+
+def yell(string: str, width: int = 40):
+    if len(string) > (width - 8):
+        width = len(string) + 8
+    print("=" * width)
+    i = len(string) % 2
+    wing = (width - len(string) - 8) // 2
+    print("== " + " " * wing, string.strip('\n'), " " * (wing+i) + " ==")
+    print("=" * width)
+
 
 z = datafile.nbonds / datafile.natoms
 k = 2.5
-iter_num = itertools.count()
 
-
-def get_GV_val(mode: str) -> int:
-    if mode == "G":
-        filename = "ShearModulusG.t"
-    elif mode == "V":
-        filename = "poissonRatioV.t"
-    else:
-        raise Exception
-
-    with open(filename, "r") as f:  # ShearModulusG.t= G0
-        f.readline()
-        f.readline()
-        lines = filter((lambda x: int(x.split(' ')[0]) > 20000), f.readlines())
-        val_list = list(map((lambda x: float(x.split(' ')[1])), lines))
-        val = statistics.mean(val_list)
-        return val
-
+iter_num = itertools.count()  # while loop iteration counter
 
 # Pruning the network until some kind of condition is met.
 print("#Pruning the network until some kind of condition is met.")
 while z >= k:
-    print("===========Obtaining G0=============")
-    print("===========G0 test begins=============")
-    lmp = lammps()
-    lmp.file("in.shear")
-    lmp.close()
-    print("===========G0 test is completed=============")
+    announce(f"Obtaining G0")
+    gonko.file.ScriptFile("gonko/scripts/in.shear", lammps).run()
+    announce(f"G0 test is completed")
 
-    next(iter_num)
-    print("Number of iteration: ", iter_num)
-    G0 = get_GV_val('G')
-    print("Initial G0 aqqired:", G0)
+    yell(f"Number of iteration: {next(iter_num)}")
 
-    # @todo LEGACY CODE
-    # @body rewrite or cleanup
-    # store initial bonds in each main iteration
-    #    print("Storing initail bonds...")
-    #    with open("data.file", "r") as f:
-    #        store_bond = []
-    #        line = f.readline()
-    #        bflag = False
-    #        while line:
-    #            line = f.readline()
-    #               bflag = True
-    #            if bflag == True:
-    #                store_bond.append(line)
-    #    print("Storing initail bonds complete.")
-
-    #    nbonds = len(store_bond)
+    G0 = gonko.file.ScriptOuput("ShearModulusG.t").avg(2000, 10000)
+    announce(f"Initial G0 aqqired: {G0}")
 
     deltaG = []
-    #    print("nmber of bonds =",b)
-    print("Deleting bonds...")
-    for idx in range(datafile.nbonds):
-        print("*"*20)
-        print("*"*20)
-        print(f"entering bond iteration: {idx}")
-        try:
-            print(f"temdeleted (previous) : {temdeleted}")
-        except:
-            pass
-        print("*"*20)
-        print("*"*20)
 
+    announce(f"number of bonds = {datafile.nbonds}")
+    yell(f"Deleting bonds...")
+    for idx in range(1, datafile.nbonds + 1):
+        announce(f"entering bond iteration: {idx}")
         try:
-            temdeleted = datafile.deleteBond(idx + 1)
-            print("@"*30)
-            print("@"*30)
-            print("tem =", temdeleted)
-            print("@"*30)
-            print("@"*30)
-        except utils.fileio.datafile.BoundNotFoundError as e:
+            temdeleted = datafile.deleteBond(idx)
+        except gonko.file.DataFile.BondNotFoundError:
             # Already deleted
             continue
 
-        print(f"===========Obtaining Gi=============")
-        print(f"===========Gi test begings=============")
-        lmp = lammps()
-        lmp.file("in.shear")
-        lmp.close()
-        print(f"===========Gi testd is completed=============")
-        tmp_G = get_GV_val('G')
+        announce(f"Obtaining Gi")
+        gonko.file.ScriptFile("gonko/scripts/in.shear", lammps).run()
+        announce(f"Gi test is completed")
+
+        tmp_G = gonko.file.ScriptOuput("ShearModulusG.t").avg(2000, 10000)
         deltaG.append((idx, tmp_G - G0))
         # recover what was deleted in 'try'
-        print(f"about to try to recover bond: {temdeleted}")
-        datafile.recoverBond(temdeleted)
+        datafile.addBond(temdeleted)
 
-    tmp_idx, min_G = min(deltaG, key=(lambda x: x[0]))
-    datafile.deleteBond(idx + 1)  # = lowest deltaGi
+    tmp_idx, min_dG = min(deltaG, key=(lambda x: x[1]))
+    datafile.deleteBond(idx)  # = lowest deltaGi
+    yell(f"Bond with lowest deltaG: {tmp_idx}(delta: {min_dG}) deleted")
 
-    print("Bonds deleted.")
+    announce(f"Calculating V of the sample of this iteration.")
+    V = gonko.file.ScriptFile("gonko/scripts/in.uniaxial", lammps).run()
+    announce(f"V test is completed")
 
-    print("Calculating V of the sample of this iteration.")
-    lmp = lammps()
-    lmp.file("in.uniaxial")
-    lmp.close()
-    print("===========V test is completed=============")
-    V = get_GV_val('V')
-    print("Iteration is completed.")
+    V = gonko.file.ScriptOuput("poissonRatioV.t").avg(2000, 10000)
+    announce(f"Iteration is completed.")
+
+    z = datafile.nbonds / datafile.natoms
 
     if not os.path.isdir('./checkpoint'):
         os.mkdir('./checkpoint')
 
-    z = datafile.nbonds / datafile.natoms
+    shutil.copy("data.file", f"./checkpoint/data_v{V}_z{z}.file")
+    print("Data saved at ./checkpoint")
 
-    # @todo check with designer to see if we need checkpoints
-    # with open("./checkpoint/data_v{}_z{}.file".format(V, z), "w+") as f:
-    #     for line in lines:
-    #         f.write(line)
-
-    # print("Data saved at ./checkpoint")
-    # copydata then save data in another folder
-
-print("Pruing process finished.")
-print("The final poisson ratio is =", V)
+announce(f"Pruing process finished.")
+# print("The final poisson ratio is =", V)
