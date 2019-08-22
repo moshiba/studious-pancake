@@ -6,7 +6,6 @@ import itertools
 import statistics
 import shutil
 
-
 # Aquire some initial condition Z K
 print("Aquiring some initial condition eg. Z and K")
 datafile = gonko.file.DataFile("data.file")
@@ -26,7 +25,7 @@ def yell(string: str, width: int = 40):
     print("=" * width)
     i = len(string) % 2
     wing = (width - len(string) - 8) // 2
-    print("== " + " " * wing, string.strip('\n'), " " * (wing+i) + " ==")
+    print("== " + " " * wing, string.strip('\n'), " " * (wing + i) + " ==")
     print("=" * width)
 
 
@@ -60,7 +59,8 @@ while z >= k:
             continue
 
         announce(f"Obtaining Gi")
-        gonko.file.ScriptFile("gonko/scripts/in.shear", lammps).run()
+        gonko.file.ScriptFile("gonko/scripts/in.shear",
+                              lammps).run("data.file", "ShearModulusG.t")
         announce(f"Gi test is completed")
 
         tmp_G = gonko.file.ScriptOuput("ShearModulusG.t").avg(2000, 10000)
