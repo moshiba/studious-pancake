@@ -44,15 +44,16 @@ class DataFile:
                 bond_id: index of the bond,
                     * not the index of the array containing the 'Bonds' section
         """
-        try:
+        try:  # find target bond
             idx = list(map((lambda x: x.split(' ')[0]),
                            self.Bonds)).index(str(bond_id))
         except ValueError:
             raise self.BondNotFoundError(f"bond index: {bond_id}")
             # Exits function
 
+        old_nbonds = self.nbonds
         popped = self.Bonds.pop(idx)
-        self.set_nbonds(self.nbonds - 1)
+        self.set_nbonds(old_nbonds - 1)
 
         self.__writeback()
         return popped
