@@ -59,24 +59,6 @@ class TestBasicOperations:
 
 
 class TestProperties:
-    def test_is_latest(self, df_factory):
-        df = df_factory("grouping")
-        assert df.is_latest is True
-        assert df._DataFile__latest == df.is_latest
-
-        df._DataFile__latest = False
-        assert df.is_latest is False
-
-        df._DataFile__latest = True
-        assert df.is_latest is True
-
-    def test_file_changed(self, df_factory):
-        df = df_factory("grouping")
-        assert df._DataFile__latest is True
-
-        df.file_changed()
-        assert df._DataFile__latest is False
-
     def test_natoms(self, df_factory):
         df = df_factory("properties")
         assert df.natoms == 459
