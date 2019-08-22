@@ -13,7 +13,7 @@ print(f"natoms: {datafile.natoms}")
 print(f"nbonds: {datafile.nbonds}")
 
 
-def anounce(string: str, level: int = 12):
+def announce(string: str, level: int = 12):
     print("=" * level, end='')
     print(string.strip('\n'), end='')
     print("=" * level)
@@ -37,10 +37,9 @@ iter_num = itertools.count()  # while loop iteration counter
 # Pruning the network until some kind of condition is met.
 print("#Pruning the network until some kind of condition is met.")
 while z >= k:
-    anounce("Obtaining G0")
-    anounce("G0 test begins")
+    announce("G0 test begins")
     gonko.file.ScriptFile("gonko/scripts/in.shear", lammps).run()
-    anounce("G0 test is completed")
+    announce("G0 test is completed")
 
     print("Number of iteration: ", next(iter_num))
 
@@ -70,10 +69,10 @@ while z >= k:
             # Already deleted
             continue
 
-        anounce(f"Obtaining Gi")
-        anounce(f"Gi test begings")
+        announce(f"Obtaining Gi")
+        announce(f"Gi test begings")
         gonko.file.ScriptFile("gonko/scripts/in.shear", lammps).run()
-        anounce(f"Gi testd is completed")
+        announce(f"Gi testd is completed")
         tmp_G = gonko.file.ScriptOuput("ShearModulusG.t").avg(2000, 10000)
         deltaG.append((idx, tmp_G - G0))
         # recover what was deleted in 'try'
@@ -87,7 +86,7 @@ while z >= k:
 
     print("Calculating V of the sample of this iteration.")
     V = gonko.file.ScriptFile("gonko/scripts/in.uniaxial", lammps).run()
-    anounce("V test is completed")
+    announce("V test is completed")
 
     V = gonko.file.ScriptOuput("poissonRatioV.t").avg(2000, 10000)
     print("Iteration is completed.")
