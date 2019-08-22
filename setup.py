@@ -24,7 +24,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="gonko",
-    version="1.0.0",
+    version="1.1.0",
     author="HsuanTingLu",
     author_email="hsuan.ting.lu.ee05@g2.nctu.edu.tw",
     description="Mysterious structure bond pruning routine wrapper",
