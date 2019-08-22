@@ -51,6 +51,7 @@ class DataFile:
             raise self.BondNotFoundError(f"bond index: {bond_id}")
             # Exits function
 
+        # to avoid a premature _update() call that resets unwritten changes
         old_nbonds = self.nbonds
         popped = self.Bonds.pop(idx)
         self.set_nbonds(old_nbonds - 1)
@@ -73,13 +74,16 @@ class DataFile:
             raise self.BondAlreadyExistsError(f"bond: {bond}")
             # Exits function
 
+        # to avoid a premature _update() call that resets unwritten changes
+        old_nbonds = self.nbonds
         self.Bonds.append(bond)
-        assert bond in self.Bonds
-        assert bond in self.groups[14]  # DEBUG
-        print(f"Bonds Group size: {len(self.Bonds)}")
-        print(f"target bond index: {self.Bonds.index(bond)}")
-        self.Bonds.sort(key=(lambda x: int(x.split(' ')[0])))
-        self.set_nbonds(self.nbonds + 1)
+        # use self.groups[14] instead of self.Bonds
+        #   to avoid implicit __update() calls
+        assert bond in self.groups[14]
+        print(f"Bonds Group size: {len(self.groups[14])}")
+        print(f"target bond index: {self.groups[14].index(bond)}")
+        self.groups[14].sort(key=(lambda x: int(x.split(' ')[0])))
+        self.set_nbonds(old_nbonds + 1)
 
         self.__writeback()
 
