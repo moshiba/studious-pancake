@@ -49,7 +49,7 @@ class TestBasicOperations:
         df._DataFile__writeback()
         with open(df.filename, 'r') as f:
             lines = f.readlines()
-            for i in range(30):
+            for i in range(29):
                 if i % 4 == 0:
                     assert lines[i] == "test odd\n"
                 elif i % 4 == 2:

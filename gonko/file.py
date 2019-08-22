@@ -28,10 +28,14 @@ class DataFile:
 
     def __writeback(self):
         with open(self.filename, 'w') as f:
+            first = True
             for g in self.groups:
+                if first:
+                    first = False
+                else:
+                    f.write("\n")
                 for line in g:
                     f.write(line)
-                f.write("\n")
             f.flush()
 
     def deleteBond(self, bond_id: int) -> str:
