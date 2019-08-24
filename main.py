@@ -14,8 +14,8 @@ print(f"nbonds: {datafile.nbonds}")
 
 
 def announce(string: str, level: int = 12):
-    print("=" * level, end='')
-    print(string.strip('\n'), end='')
+    print("=" * level, end=' ')
+    print(string.strip('\n'), end=' ')
     print("=" * level)
 
 
