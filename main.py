@@ -35,17 +35,16 @@ k = 2.5
 iter_num = itertools.count()  # while loop iteration counter
 
 # Pruning the network until some kind of condition is met.
-print("#Pruning the network until some kind of condition is met.")
+yell(f"{datafile.nbonds - (k * datafile.natoms) + 1} bonds to delete")
+
+
+announce(f"Obtaining G0")
+gonko.file.ScriptFile("gonko/scripts/in.shear", lammps).run()
+G0 = gonko.file.ScriptOuput("ShearModulusG.t").avg(2000, 10000)
+announce(f"G0 test is completed")
+announce(f"Initial G0 aqqired: {G0}")
+
 while z >= k:
-    announce(f"Obtaining G0")
-    gonko.file.ScriptFile("gonko/scripts/in.shear", lammps).run()
-    announce(f"G0 test is completed")
-
-    yell(f"Number of iteration: {next(iter_num)}")
-
-    G0 = gonko.file.ScriptOuput("ShearModulusG.t").avg(2000, 10000)
-    announce(f"Initial G0 aqqired: {G0}")
-
     deltaG = []
 
     announce(f"number of bonds = {datafile.nbonds}")
@@ -77,8 +76,12 @@ while z >= k:
     announce(f"V test is completed")
 
     V = gonko.file.ScriptOuput("poissonRatioV.t").avg(2000, 10000)
-    announce(f"Iteration is completed.")
 
+    # Update G0
+    gonko.file.ScriptFile("gonko/scripts/in.shear", lammps).run()
+    G0 = gonko.file.ScriptOuput("ShearModulusG.t").avg(2000, 10000)
+
+    announce(f"Iteration is completed.")
     z = datafile.nbonds / datafile.natoms
 
     if not os.path.isdir('./checkpoint'):
