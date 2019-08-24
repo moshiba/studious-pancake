@@ -209,7 +209,7 @@ class DataFile:
 
 
 class ScriptFile:
-    def __init__(self, filename, library):
+    def __init__(self, filename: str, library):
         self.filename = filename
         self.library = library
 
