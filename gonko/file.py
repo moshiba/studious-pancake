@@ -50,14 +50,14 @@ class DataFile:
         except ValueError:
             raise self.BondNotFoundError(f"bond index: {bond_id}")
             # Exits function
+        else:
+            # to avoid a premature _update() call that resets unwritten changes
+            old_nbonds = self.nbonds
+            popped = self.Bonds.pop(idx)
+            self.set_nbonds(old_nbonds - 1)
 
-        # to avoid a premature _update() call that resets unwritten changes
-        old_nbonds = self.nbonds
-        popped = self.Bonds.pop(idx)
-        self.set_nbonds(old_nbonds - 1)
-
-        self.__writeback()
-        return popped
+            self.__writeback()
+            return popped
 
     def deleteAtom(self, atom_id: int) -> str:
         # @todo expect class to generalize someday
@@ -73,19 +73,19 @@ class DataFile:
         except AssertionError:
             raise self.BondAlreadyExistsError(f"bond: {bond}")
             # Exits function
+        else:
+            # to avoid a premature _update() call that resets unwritten changes
+            old_nbonds = self.nbonds
+            self.Bonds.append(bond)
+            # use self.groups[14] instead of self.Bonds
+            #   to avoid implicit __update() calls
+            assert bond in self.groups[14]
+            print(f"Bonds Group size: {len(self.groups[14])}")
+            print(f"target bond index: {self.groups[14].index(bond)}")
+            self.groups[14].sort(key=(lambda x: int(x.split(' ')[0])))
+            self.set_nbonds(old_nbonds + 1)
 
-        # to avoid a premature _update() call that resets unwritten changes
-        old_nbonds = self.nbonds
-        self.Bonds.append(bond)
-        # use self.groups[14] instead of self.Bonds
-        #   to avoid implicit __update() calls
-        assert bond in self.groups[14]
-        print(f"Bonds Group size: {len(self.groups[14])}")
-        print(f"target bond index: {self.groups[14].index(bond)}")
-        self.groups[14].sort(key=(lambda x: int(x.split(' ')[0])))
-        self.set_nbonds(old_nbonds + 1)
-
-        self.__writeback()
+            self.__writeback()
 
     def addAtom(self, atom: str):
         # @todo expect class to generalize someday
