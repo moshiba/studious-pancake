@@ -24,3 +24,12 @@ import gonko
 
 def LammpsJob(script: str, library, data_src: str, bond: int):
     """ a LAMMPS job wrapper for process-pool.map() """
+    workdir = f"job/{bond}/"
+    if os.path.isdir(workdir):
+        os.makedirs(workdir)
+
+    data = shutil.copy(data_src, workdir + "data.file")
+    output = f"workdir/{script}_out.t"
+    gonko.file.ScriptFile(script, library).run(data, output, "none")
+
+    return bond, gonko.file.ScriptOuput(output).avg
