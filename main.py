@@ -49,13 +49,9 @@ while z >= k:
 
     announce(f"number of bonds = {datafile.nbonds}")
     yell(f"Deleting bonds...")
-    for idx in range(1, datafile.nbonds + 1):
+    for idx in [b.split(" ")[0] for b in datafile.Bonds]:
         announce(f"entering bond iteration: {idx}")
-        try:
-            temdeleted = datafile.deleteBond(idx)
-        except gonko.file.DataFile.BondNotFoundError:
-            # Already deleted
-            continue
+        temdeleted = datafile.deleteBond(idx)
 
         announce(f"Obtaining Gi")
         gonko.file.ScriptFile("gonko/scripts/in.shear",
