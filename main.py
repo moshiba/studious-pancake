@@ -39,7 +39,7 @@ yell(f"{datafile.nbonds - (k * datafile.natoms) + 1} bonds to delete")
 
 
 announce(f"Obtaining G0")
-gonko.file.ScriptFile("gonko/scripts/in.shear", lammps).run()
+gonko.file.ScriptFile("gonko/scripts/in.shear", lammps).run("data.file", "ShearModulusG.t")
 G0 = gonko.file.ScriptOuput("ShearModulusG.t").avg(2000, 10000)
 announce(f"G0 test is completed")
 announce(f"Initial G0 aqqired: {G0}")
@@ -68,13 +68,13 @@ while z >= k:
     yell(f"Bond with lowest deltaG: {tmp_idx}(delta: {min_dG}) deleted")
 
     announce(f"Calculating V of the sample of this iteration.")
-    V = gonko.file.ScriptFile("gonko/scripts/in.uniaxial", lammps).run()
+    V = gonko.file.ScriptFile("gonko/scripts/in.uniaxial", lammps).run("data.file", "poissonRatioV.t")
     announce(f"V test is completed")
 
     V = gonko.file.ScriptOuput("poissonRatioV.t").avg(2000, 10000)
 
     # Update G0
-    gonko.file.ScriptFile("gonko/scripts/in.shear", lammps).run()
+    gonko.file.ScriptFile("gonko/scripts/in.shear", lammps).run("data.file", "ShearModulusG.t")
     G0 = gonko.file.ScriptOuput("ShearModulusG.t").avg(2000, 10000)
 
     announce(f"Iteration is completed.")
