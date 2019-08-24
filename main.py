@@ -64,7 +64,7 @@ while z >= k:
         announce(f"Gi test is completed")
 
         tmp_G = gonko.file.ScriptOuput("ShearModulusG.t").avg(2000, 10000)
-        deltaG.append((idx, tmp_G - G0))
+        deltaG.append((idx, tmp_G))
         # recover what was deleted in 'try'
         datafile.addBond(temdeleted)
 
