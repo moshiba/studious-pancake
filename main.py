@@ -51,17 +51,10 @@ while z >= k:
     yell(f"Deleting bonds...")
     for idx in [b.split(" ")[0] for b in datafile.Bonds]:
         announce(f"entering bond iteration: {idx}")
-        temdeleted = datafile.deleteBond(idx)
-
-        announce(f"Obtaining Gi")
-        gonko.file.ScriptFile("gonko/scripts/in.shear",
-                              lammps).run("data.file", "ShearModulusG.t")
-        announce(f"Gi test is completed")
-
-        tmp_G = gonko.file.ScriptOuput("ShearModulusG.t").avg(2000, 10000)
-        deltaG.append((idx, tmp_G))
-        # recover what was deleted in 'try'
-        datafile.addBond(temdeleted)
+        deltaG.append(
+            tuple(
+                gonko.parallel.LammpsJob("gonko/scripts/in.shear", lammps,
+                                         "data.file", idx)))
 
     tmp_idx, min_dG = min(deltaG, key=(lambda x: x[1]))
     datafile.deleteBond(idx)  # = lowest deltaGi
