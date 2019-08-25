@@ -68,9 +68,7 @@ while z >= k:
     V = gonko.file.ScriptOuput("poissonRatioV.t").avg(2000, 10000)
 
     # Update G0
-    gonko.file.ScriptFile("gonko/scripts/in.shear",
-                          lammps).run("data.file", "ShearModulusG.t")
-    G0 = gonko.file.ScriptOuput("ShearModulusG.t").avg(2000, 10000)
+    G0 = min_Gi
 
     announce(f"Iteration is completed.")
     z = datafile.nbonds / datafile.natoms
@@ -78,7 +76,8 @@ while z >= k:
     if not os.path.isdir('./checkpoint'):
         os.mkdir('./checkpoint')
 
-    shutil.copy("data.file", f"./checkpoint/data_v{V}_z{z}.file")
+    shutil.copy(f"job/{tmp_idx}/data.file",
+                f"./checkpoint/data_v{V}_z{z}.file")
     print("Data saved at ./checkpoint")
 
 announce(f"Pruing process finished.")
