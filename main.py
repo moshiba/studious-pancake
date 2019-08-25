@@ -45,20 +45,20 @@ announce(f"G0 test is completed")
 announce(f"Initial G0 aqqired: {G0}")
 
 while z >= k:
-    deltaG = []
+    GiList = []
 
     announce(f"number of bonds = {datafile.nbonds}")
     yell(f"Deleting bonds...")
     for idx in [b.split(" ")[0] for b in datafile.Bonds]:
         announce(f"entering bond iteration: {idx}")
-        deltaG.append(
+        GiList.append(
             tuple(
                 gonko.parallel.LammpsJob("gonko/scripts/in.shear", lammps,
                                          "data.file", idx)))
 
-    tmp_idx, min_dG = min(deltaG, key=(lambda x: x[1]))
-    datafile.deleteBond(idx)  # = lowest deltaGi
-    yell(f"Bond with lowest deltaG: {tmp_idx}(delta: {min_dG}) deleted")
+    tmp_idx, min_Gi = min(GiList, key=(lambda x: x[1]))
+    datafile.deleteBond(idx)  # = lowest Gi
+    yell(f"Bond with lowest GiList: {tmp_idx}(Gi: {min_Gi}) deleted")
 
     announce(f"Calculating V of the sample of this iteration.")
     V = gonko.file.ScriptFile("gonko/scripts/in.uniaxial",
