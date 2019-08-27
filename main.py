@@ -6,12 +6,6 @@ import itertools
 import statistics
 import shutil
 
-# Aquire some initial condition Z K
-print("Aquiring some initial condition eg. Z and K")
-datafile = gonko.file.DataFile("data.file")
-print(f"natoms: {datafile.natoms}")
-print(f"nbonds: {datafile.nbonds}")
-
 
 def announce(string: str, level: int = 12):
     print("=" * level, end=' ')
@@ -29,8 +23,11 @@ def yell(string: str, width: int = 40):
     print("=" * width)
 
 
-k = 2.5
+datafile = gonko.file.DataFile("data.file")
+print(f"natoms: {datafile.natoms}")
+print(f"nbonds: {datafile.nbonds}")
 
+k = 2.5
 iter_num = itertools.count()  # while loop iteration counter
 
 # Pruning the network until some kind of condition is met.
@@ -40,7 +37,6 @@ announce(f"Obtaining G0")
 gonko.file.ScriptFile("gonko/scripts/in.shear",
                       lammps).run("data.file", "ShearModulusG.t")
 G0 = gonko.file.ScriptOuput("ShearModulusG.t").avg(2000, 10000)
-announce(f"G0 test is completed")
 announce(f"Initial G0 aqqired: {G0}")
 
 while datafile.nbonds / datafile.natoms >= k:
