@@ -29,7 +29,6 @@ def yell(string: str, width: int = 40):
     print("=" * width)
 
 
-z = datafile.nbonds / datafile.natoms
 k = 2.5
 
 iter_num = itertools.count()  # while loop iteration counter
@@ -44,7 +43,7 @@ G0 = gonko.file.ScriptOuput("ShearModulusG.t").avg(2000, 10000)
 announce(f"G0 test is completed")
 announce(f"Initial G0 aqqired: {G0}")
 
-while z >= k:
+while datafile.nbonds / datafile.natoms >= k:
     GiList = []
 
     announce(f"number of bonds = {datafile.nbonds}")
@@ -71,7 +70,6 @@ while z >= k:
     G0 = min_Gi
 
     announce(f"Iteration is completed.")
-    z = datafile.nbonds / datafile.natoms
 
     if not os.path.isdir('./checkpoint'):
         os.mkdir('./checkpoint')
