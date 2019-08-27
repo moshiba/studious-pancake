@@ -1,36 +1,19 @@
 import gonko
 from lammps import lammps
 import os
-import math
+import concurrent.futures as cf
+from tqdm import tqdm
 import itertools
-import statistics
 import shutil
+from gonko.utils.output import announce, yell
 
-
-def announce(string: str, level: int = 12):
-    print("=" * level, end=' ')
-    print(string.strip('\n'), end=' ')
-    print("=" * level)
-
-
-def yell(string: str, width: int = 40):
-    if len(string) > (width - 8):
-        width = len(string) + 8
-    print("=" * width)
-    i = len(string) % 2
-    wing = (width - len(string) - 8) // 2
-    print("== " + " " * wing, string.strip('\n'), " " * (wing + i) + " ==")
-    print("=" * width)
-
-
-datafile = gonko.file.DataFile("data.file")
-print(f"natoms: {datafile.natoms}")
-print(f"nbonds: {datafile.nbonds}")
 
 k = 2.5
 iter_num = itertools.count()  # while loop iteration counter
 
-# Pruning the network until some kind of condition is met.
+datafile = gonko.file.DataFile("data.file")
+print(f"natoms: {datafile.natoms}")
+print(f"nbonds: {datafile.nbonds}")
 yell(f"{datafile.nbonds - (k * datafile.natoms) + 1} bonds to delete")
 
 announce(f"Obtaining G0")
