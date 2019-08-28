@@ -24,15 +24,16 @@ import pathlib
 from lammps import lammps
 
 
-def LammpsJob(script: str, data_src: str, bond: int):
+def LammpsJob(bond: int):
     """ a LAMMPS job wrapper for process-pool.map() """
     # Creates working directory
+    script = "gonko/scripts/in.shear"
     workdir = f"job/{bond}/"
-    if os.path.isdir(workdir):
+    if not os.path.isdir(workdir):
         os.makedirs(workdir)
 
     # Duplicates 'data.file' and deletes a bond
-    data = shutil.copy(data_src, workdir + "data.file")
+    data = shutil.copy("data.file", workdir + "data.file")
     gonko.file.DataFile(data).deleteBond(bond)
 
     # Runs LAMMPS script

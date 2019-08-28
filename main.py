@@ -28,8 +28,6 @@ while z >= k:
     with cf.ProcessPoolExecutor(max_workers=None) as executor:
         minBond, minGi = min(list(
             tqdm(executor.map(gonko.parallel.LammpsJob,
-                              itertools.cycle("gonko/scripts/in.shear"),
-                              itertools.cycle("data.file"),
                               [int(b.split(" ")[0]) for b in datafile.Bonds],
                               timeout=None,
                               chunksize=1),
