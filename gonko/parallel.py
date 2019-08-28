@@ -21,9 +21,10 @@ import os
 import shutil
 import gonko
 import pathlib
+from lammps import lammps
 
 
-def LammpsJob(script: str, library, data_src: str, bond: int):
+def LammpsJob(script: str, data_src: str, bond: int):
     """ a LAMMPS job wrapper for process-pool.map() """
     # Creates working directory
     workdir = f"job/{bond}/"
@@ -36,7 +37,7 @@ def LammpsJob(script: str, library, data_src: str, bond: int):
 
     # Runs LAMMPS script
     output = f"workdir/{pathlib.PurePath(script).name}_out.t"
-    gonko.file.ScriptFile(script, library).run(data, output, "none")
+    gonko.file.ScriptFile(script, lammps).run(data, output, "none")
 
     # Collects result and return
     return bond, gonko.file.ScriptOuput(output).avg

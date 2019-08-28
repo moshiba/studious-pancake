@@ -29,7 +29,6 @@ while z >= k:
         minBond, minGi = min(list(
             tqdm(executor.map(gonko.parallel.LammpsJob,
                               itertools.cycle("gonko/scripts/in.shear"),
-                              itertools.cycle(lammps),
                               itertools.cycle("data.file"),
                               [int(b.split(" ")[0]) for b in datafile.Bonds],
                               timeout=None,
