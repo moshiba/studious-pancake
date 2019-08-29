@@ -232,10 +232,11 @@ class ScriptFile:
     def run(self,
             data_in: str = "data.file",
             data_out: str = "out.t",
-            screen_out: str = "log",  # "none"
+            screen_out: str = "none",
             logfile: str = "log.lammps"):
         lmp = self.library(cmdargs=[
-            "-echo", f"{screen_out}", "-var", "gonko_data_in", f"{data_in}",
+            "-echo", "both",
+            "-screen", f"{screen_out}", "-var", "gonko_data_in", f"{data_in}",
             "-var", "gonko_data_out", f"{data_out}"
         ])
         lmp.file(self.filename)

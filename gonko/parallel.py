@@ -38,7 +38,7 @@ def LammpsJobFactory(data_src: str, script: str, work_dir: str, library):
 
         # Runs LAMMPS script
         output = f"{workdir}/{pathlib.PurePath(script).name}_out.t"
-        gonko.file.ScriptFile(script, library).run(data, output, "log",
+        gonko.file.ScriptFile(script, library).run(data, output, "none",
                                                    workdir+"log.lammps")
 
         # Collects result and return
