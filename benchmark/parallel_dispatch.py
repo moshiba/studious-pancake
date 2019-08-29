@@ -37,9 +37,10 @@ for iter_num in range(4):
             to be pickled,
             a function must be defined at the top level of the module
             """
-            bond, avg = gonko.parallel.LammpsJobFactory(
+            _LammpsJob = gonko.parallel.LammpsJobFactory(
                 datafile.filename, "gonko/scripts/in.shear", "./",
-                lammps)(bond)
+                lammps)
+            bond, avg = _LammpsJob(bond)
             return bond, avg
 
         minBond, minGi = min(list(
