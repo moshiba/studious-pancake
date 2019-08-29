@@ -235,7 +235,7 @@ class ScriptFile:
             screen_out: str = "log",  # "none"
             logfile: str = "log.lammps"):
         lmp = self.library(cmdargs=[
-            "-screen", f"{screen_out}", "-var", "gonko_data_in", f"{data_in}",
+            "-echo", f"{screen_out}", "-var", "gonko_data_in", f"{data_in}",
             "-var", "gonko_data_out", f"{data_out}"
         ])
         lmp.file(self.filename)
