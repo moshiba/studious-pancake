@@ -38,8 +38,7 @@ for iter_num in range(2):
             a function must be defined at the top level of the module
             """
             _LammpsJob = gonko.parallel.LammpsJobFactory(
-                datafile.filename, "gonko/scripts/in.shear", "./",
-                lammps)
+                datafile.filename, "gonko/scripts/in.shear", "./", lammps)
             bond, avg = _LammpsJob(bond)
             return bond, avg
 
