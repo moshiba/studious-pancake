@@ -35,11 +35,10 @@ for iter_num in range(4):
                                                     "gonko/scripts/in.shear",
                                                     "./", lammps)
         minBond, minGi = min(list(
-            tqdm(executor.map(gonko.parallel.LammpsJobFactory(
-                LammpsJob, datafile.filename, "gonko/scripts/in.shear", "./",
-                lammps), [int(b.split(" ")[0]) for b in datafile.Bonds[:8]],
-                              timeout=None,
-                              chunksize=1),
+            tqdm(executor.map(
+                LammpsJob, [int(b.split(" ")[0]) for b in datafile.Bonds[:8]],
+                timeout=None,
+                chunksize=1),
                  desc="Trying Bonds",
                  total=8,
                  position=0)),
