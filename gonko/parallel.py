@@ -42,7 +42,7 @@ def LammpsJobFactory(data_src: str, script: str, work_dir: str, library):
                                                    workdir)
 
         # Collects result and return
-        avg = gonko.file.ScriptOuput(output).avg
+        avg = gonko.file.ScriptOuput(output).avg(int(2e+3), int(10e+3))
         return bond, avg
 
     return _LammpsJob
