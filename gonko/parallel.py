@@ -21,24 +21,24 @@ import os
 import shutil
 import gonko
 import pathlib
-from lammps import lammps
 
 
-def LammpsJob(bond: int):
-    """ a LAMMPS job wrapper for process-pool.map() """
-    # Creates working directory
-    script = "gonko/scripts/in.shear"
-    workdir = f"job/{bond}/"
-    if not os.path.isdir(workdir):
-        os.makedirs(workdir)
+def LammpsJobFactory(script: str, work_dir: str, library):
+    def _LammpsJob(bond: int):
+        """ a LAMMPS job wrapper for process-pool.map() """
+        # Creates working directory
+        workdir = f"{work_dir}job/{bond}/"
+        if not os.path.isdir(workdir):
+            os.makedirs(workdir)
 
-    # Duplicates 'data.file' and deletes a bond
-    data = shutil.copy("data.file", workdir + "data.file")
-    gonko.file.DataFile(data).deleteBond(bond)
+        # Duplicates 'data.file' and deletes a bond
+        data = shutil.copy("data.file", workdir + "data.file")
+        gonko.file.DataFile(data).deleteBond(bond)
 
-    # Runs LAMMPS script
-    output = f"{workdir}/{pathlib.PurePath(script).name}_out.t"
-    gonko.file.ScriptFile(script, lammps).run(data, output, "none")
+        # Runs LAMMPS script
+        output = f"{workdir}/{pathlib.PurePath(script).name}_out.t"
+        gonko.file.ScriptFile(script, library).run(data, output, "none")
 
-    # Collects result and return
-    return bond, gonko.file.ScriptOuput(output).avg
+        # Collects result and return
+        return bond, gonko.file.ScriptOuput(output).avg
+    return _LammpsJob

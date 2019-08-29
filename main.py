@@ -23,11 +23,12 @@ announce(f"Initial G0 aqqired: {G0}")
 
 z = datafile.nbonds / datafile.natoms
 while z >= k:
-    announce(f"number of bonds = {datafile.nbonds}")
+    announce(f"round: {next(iter_num)}, number of bonds = {datafile.nbonds}")
     yell(f"Deleting bonds...")
     with cf.ProcessPoolExecutor(max_workers=None) as executor:
         minBond, minGi = min(list(
-            tqdm(executor.map(gonko.parallel.LammpsJob,
+            tqdm(executor.map(gonko.parallel.LammpsJobFactory(
+                "gonko/scripts/in.shear", "./", lammps),
                               [int(b.split(" ")[0]) for b in datafile.Bonds],
                               timeout=None,
                               chunksize=1),
