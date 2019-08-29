@@ -26,9 +26,19 @@ while z >= k:
     announce(f"round: {next(iter_num)}, number of bonds = {datafile.nbonds}")
     yell(f"Deleting bonds...")
     with cf.ProcessPoolExecutor(max_workers=None) as executor:
+
+        def LammpsJob(bond: int):
+            """
+            to be pickled,
+            a function must be defined at the top level of the module
+            """
+            _LammpsJob = gonko.parallel.LammpsJobFactory(
+                datafile.filename, "gonko/scripts/in.shear", "./", lammps)
+            bond, avg = _LammpsJob(bond)
+            return bond, avg
+
         minBond, minGi = min(list(
-            tqdm(executor.map(gonko.parallel.LammpsJobFactory(
-                datafile.filename, "gonko/scripts/in.shear", "./", lammps),
+            tqdm(executor.map(LammpsJob,
                               [int(b.split(" ")[0]) for b in datafile.Bonds],
                               timeout=None,
                               chunksize=1),
