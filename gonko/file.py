@@ -23,7 +23,9 @@ import itertools
 
 class DataFile:
     """
-    represents a 'data.file'
+    holds a filename and wrap utilities around it,
+    DOES NOT represent a file handler.
+    the actual file acted on depends solely on the filename it possess
     """
     def __init__(self, filename: str):
         self.filename = filename
