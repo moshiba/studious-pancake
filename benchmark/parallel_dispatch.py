@@ -30,16 +30,17 @@ datafile = gonko.file.DataFile("data.file")
 
 for iter_num in range(4):
     announce(f"round: {iter_num}, number of bonds = {datafile.nbonds}")
-    with cf.ProcessPoolExecutor(max_workers=None) as executor:
+    with cf.ProcessPoolExecutor(max_workers=4) as executor:
 
         def LammpsJob(bond: int):
             """
             to be pickled,
             a function must be defined at the top level of the module
             """
-            gonko.parallel.LammpsJobFactory(datafile.filename,
-                                            "gonko/scripts/in.shear", "./",
-                                            lammps)(bond)
+            bond, avg = gonko.parallel.LammpsJobFactory(
+                datafile.filename, "gonko/scripts/in.shear", "./",
+                lammps)(bond)
+            return bond, avg
 
         minBond, minGi = min(list(
             tqdm(executor.map(
