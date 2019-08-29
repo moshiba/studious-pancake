@@ -1,92 +1,68 @@
 import gonko
 from lammps import lammps
 import os
-import math
+import concurrent.futures as cf
+from tqdm import tqdm
 import itertools
-import statistics
 import shutil
+from gonko.utils.output import announce, yell
 
+k = 2.5
+iter_num = itertools.count()  # while loop iteration counter
 
-# Aquire some initial condition Z K
-print("Aquiring some initial condition eg. Z and K")
 datafile = gonko.file.DataFile("data.file")
 print(f"natoms: {datafile.natoms}")
 print(f"nbonds: {datafile.nbonds}")
+yell(f"{datafile.nbonds - (k * datafile.natoms) + 1} bonds to delete")
 
-
-def announce(string: str, level: int = 12):
-    print("=" * level, end='')
-    print(string.strip('\n'), end='')
-    print("=" * level)
-
-
-def yell(string: str, width: int = 40):
-    if len(string) > (width - 8):
-        width = len(string) + 8
-    print("=" * width)
-    i = len(string) % 2
-    wing = (width - len(string) - 8) // 2
-    print("== " + " " * wing, string.strip('\n'), " " * (wing+i) + " ==")
-    print("=" * width)
-
+announce(f"Obtaining G0")
+gonko.file.ScriptFile("gonko/scripts/in.shear",
+                      lammps).run(datafile.filename, "ShearModulusG.t")
+G0 = gonko.file.ScriptOuput("ShearModulusG.t").avg(int(2e+3), int(10e+3))
+announce(f"Initial G0 aqqired: {G0}")
 
 z = datafile.nbonds / datafile.natoms
-k = 2.5
-
-iter_num = itertools.count()  # while loop iteration counter
-
-# Pruning the network until some kind of condition is met.
-print("#Pruning the network until some kind of condition is met.")
 while z >= k:
-    announce(f"Obtaining G0")
-    gonko.file.ScriptFile("gonko/scripts/in.shear", lammps).run()
-    announce(f"G0 test is completed")
-
-    yell(f"Number of iteration: {next(iter_num)}")
-
-    G0 = gonko.file.ScriptOuput("ShearModulusG.t").avg(2000, 10000)
-    announce(f"Initial G0 aqqired: {G0}")
-
-    deltaG = []
-
-    announce(f"number of bonds = {datafile.nbonds}")
+    announce(f"round: {next(iter_num)}, number of bonds = {datafile.nbonds}")
     yell(f"Deleting bonds...")
-    for idx in range(1, datafile.nbonds + 1):
-        announce(f"entering bond iteration: {idx}")
-        try:
-            temdeleted = datafile.deleteBond(idx)
-        except gonko.file.DataFile.BondNotFoundError:
-            # Already deleted
-            continue
+    with cf.ProcessPoolExecutor(max_workers=None) as executor:
 
-        announce(f"Obtaining Gi")
-        gonko.file.ScriptFile("gonko/scripts/in.shear", lammps).run()
-        announce(f"Gi test is completed")
+        def LammpsJob(bond: int):
+            """
+            to be pickled,
+            a function must be defined at the top level of the module
+            """
+            _LammpsJob = gonko.parallel.LammpsJobFactory(
+                datafile.filename, "gonko/scripts/in.shear", "./", lammps)
+            bond, avg = _LammpsJob(bond)
+            return bond, avg
 
-        tmp_G = gonko.file.ScriptOuput("ShearModulusG.t").avg(2000, 10000)
-        deltaG.append((idx, tmp_G - G0))
-        # recover what was deleted in 'try'
-        datafile.addBond(temdeleted)
+        minBond, minGi = min(list(
+            tqdm(executor.map(LammpsJob,
+                              [int(b.split(" ")[0]) for b in datafile.Bonds],
+                              timeout=None,
+                              chunksize=1),
+                 desc="Trying Bonds",
+                 total=datafile.nbonds,
+                 position=0)),
+                             key=(lambda x: x[1]))
 
-    tmp_idx, min_dG = min(deltaG, key=(lambda x: x[1]))
-    datafile.deleteBond(idx)  # = lowest deltaGi
-    yell(f"Bond with lowest deltaG: {tmp_idx}(delta: {min_dG}) deleted")
+    yell(f"Bond with lowest GiList: {minBond}(Gi: {minGi}) deleted")
+    G0 = minGi  # Update G0
 
     announce(f"Calculating V of the sample of this iteration.")
-    V = gonko.file.ScriptFile("gonko/scripts/in.uniaxial", lammps).run()
-    announce(f"V test is completed")
-
+    gonko.file.ScriptFile("gonko/scripts/in.uniaxial",
+                          lammps).run("data.file", "poissonRatioV.t")
     V = gonko.file.ScriptOuput("poissonRatioV.t").avg(2000, 10000)
-    announce(f"Iteration is completed.")
-
-    z = datafile.nbonds / datafile.natoms
+    announce(f"V test is completed")
 
     if not os.path.isdir('./checkpoint'):
         os.mkdir('./checkpoint')
-
-
-    shutil.copy("data.file", f"./checkpoint/data_v{V}_z{z}.file")
+    shutil.copy(f"job/{minBond}/data.file",
+                f"./checkpoint/data_v{V}_z{z}.file")
     print("Data saved at ./checkpoint")
+
+    z = datafile.nbonds / datafile.natoms
 
 announce(f"Pruing process finished.")
 # print("The final poisson ratio is =", V)

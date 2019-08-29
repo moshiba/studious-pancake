@@ -24,25 +24,24 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="gonko",
-    version="1.0.0",
+    version="1.2.0",
     author="HsuanTingLu",
     author_email="hsuan.ting.lu.ee05@g2.nctu.edu.tw",
-    description="Mysterious structure bond pruning routine wrapper",
+    description=
+    "Mysterious structure bond pruning routine wrapper with parallel task dispatching ability",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/HsuanTingLu/studious-pancake",
     packages=setuptools.find_packages(),
+    install_requires=["tqdm"],
     classifiers=[
-        "Programming Language :: Python :: 3.7"
-        "Development Status :: 1 - Planning",
-        "Environment :: Console",
-        "Framework :: Pytest",
-        "Intended Audience :: Science/Research",
+        "Programming Language :: Python :: 3.7",
+        "Development Status :: 1 - Planning", "Environment :: Console",
+        "Framework :: Pytest", "Intended Audience :: Science/Research",
         "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
         "Operating System :: OS Independent",
         "Natural Language :: Chinese (Traditional)",
-        "Natural Language :: English",
-        "Operating System :: POSIX",
+        "Natural Language :: English", "Operating System :: POSIX",
         "Topic :: Scientific/Engineering :: Physics"
-        ],
+    ],
 )

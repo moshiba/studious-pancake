@@ -1,6 +1,20 @@
-""" file
-------------
-helper functions for files
+"""
+
+    helper functions for files
+    Copyright (C) 2019 Hsuan-Ting Lu
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 """
 import statistics
@@ -9,7 +23,9 @@ import itertools
 
 class DataFile:
     """
-    represents a 'data.file'
+    holds a filename and wrap utilities around it,
+    DOES NOT represent a file handler.
+    the actual file acted on depends solely on the filename it possess
     """
     def __init__(self, filename: str):
         self.filename = filename
@@ -50,14 +66,14 @@ class DataFile:
         except ValueError:
             raise self.BondNotFoundError(f"bond index: {bond_id}")
             # Exits function
+        else:
+            # to avoid a premature _update() call that resets unwritten changes
+            old_nbonds = self.nbonds
+            popped = self.Bonds.pop(idx)
+            self.set_nbonds(old_nbonds - 1)
 
-        # to avoid a premature _update() call that resets unwritten changes
-        old_nbonds = self.nbonds
-        popped = self.Bonds.pop(idx)
-        self.set_nbonds(old_nbonds - 1)
-
-        self.__writeback()
-        return popped
+            self.__writeback()
+            return popped
 
     def deleteAtom(self, atom_id: int) -> str:
         # @todo expect class to generalize someday
@@ -73,19 +89,19 @@ class DataFile:
         except AssertionError:
             raise self.BondAlreadyExistsError(f"bond: {bond}")
             # Exits function
+        else:
+            # to avoid a premature _update() call that resets unwritten changes
+            old_nbonds = self.nbonds
+            self.Bonds.append(bond)
+            # use self.groups[14] instead of self.Bonds
+            #   to avoid implicit __update() calls
+            assert bond in self.groups[14]
+            print(f"Bonds Group size: {len(self.groups[14])}")
+            print(f"target bond index: {self.groups[14].index(bond)}")
+            self.groups[14].sort(key=(lambda x: int(x.split(' ')[0])))
+            self.set_nbonds(old_nbonds + 1)
 
-        # to avoid a premature _update() call that resets unwritten changes
-        old_nbonds = self.nbonds
-        self.Bonds.append(bond)
-        # use self.groups[14] instead of self.Bonds
-        #   to avoid implicit __update() calls
-        assert bond in self.groups[14]
-        print(f"Bonds Group size: {len(self.groups[14])}")
-        print(f"target bond index: {self.groups[14].index(bond)}")
-        self.groups[14].sort(key=(lambda x: int(x.split(' ')[0])))
-        self.set_nbonds(old_nbonds + 1)
-
-        self.__writeback()
+            self.__writeback()
 
     def addAtom(self, atom: str):
         # @todo expect class to generalize someday
@@ -209,12 +225,20 @@ class DataFile:
 
 
 class ScriptFile:
-    def __init__(self, filename, library):
+    def __init__(self, filename: str, library):
         self.filename = filename
         self.library = library
 
-    def run(self):
-        lmp = self.library()
+    def run(self,
+            data_in: str = "data.file",
+            data_out: str = "out.t",
+            screen_out: str = "none",
+            logfile: str = "log.lammps"):
+        lmp = self.library(cmdargs=[
+            "-echo", "both",
+            "-screen", f"{screen_out}", "-var", "gonko_data_in", f"{data_in}",
+            "-var", "gonko_data_out", f"{data_out}"
+        ])
         lmp.file(self.filename)
         lmp.close()
 
