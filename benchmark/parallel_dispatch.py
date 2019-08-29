@@ -17,3 +17,27 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 """
+
+import gonko
+from lammps import lammps
+import concurrent.futures as cf
+import os
+import shutil
+from tqdm import tqdm
+from gonko.utils.output import announce, yell
+
+datafile = gonko.file.DataFile("data.file")
+
+for iter_num in range(4):
+    announce(f"round: {next(iter_num)}, number of bonds = {datafile.nbonds}")
+    with cf.ProcessPoolExecutor(max_workers=None) as executor:
+        minBond, minGi = min(list(
+            tqdm(executor.map(gonko.parallel.LammpsJobFactory(
+                datafile.filename, "gonko/scripts/in.shear", "./",
+                lammps), [int(b.split(" ")[0]) for b in datafile.Bonds[:8]],
+                              timeout=None,
+                              chunksize=1),
+                 desc="Trying Bonds",
+                 total=8,
+                 position=0)),
+                             key=(lambda x: x[1]))
