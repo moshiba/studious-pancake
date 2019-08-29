@@ -37,7 +37,7 @@ def LammpsJob(bond: int):
     gonko.file.DataFile(data).deleteBond(bond)
 
     # Runs LAMMPS script
-    output = f"workdir/{pathlib.PurePath(script).name}_out.t"
+    output = f"{workdir}/{pathlib.PurePath(script).name}_out.t"
     gonko.file.ScriptFile(script, lammps).run(data, output, "none")
 
     # Collects result and return
