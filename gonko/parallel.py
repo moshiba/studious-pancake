@@ -39,7 +39,7 @@ def LammpsJobFactory(data_src: str, script: str, work_dir: str, library):
         # Runs LAMMPS script
         output = f"{workdir}/{pathlib.PurePath(script).name}_out.t"
         gonko.file.ScriptFile(script, library).run(data, output, "log",
-                                                   workdir)
+                                                   workdir+"log.lammps")
 
         # Collects result and return
         avg = gonko.file.ScriptOuput(output).avg(int(2e+3), int(10e+3))
