@@ -28,7 +28,7 @@ from gonko.utils.output import announce, yell
 
 datafile = gonko.file.DataFile("data.file")
 
-for iter_num in range(4):
+for iter_num in range(2):
     announce(f"round: {iter_num}, number of bonds = {datafile.nbonds}")
     with cf.ProcessPoolExecutor(max_workers=4) as executor:
 
@@ -45,10 +45,10 @@ for iter_num in range(4):
 
         minBond, minGi = min(list(
             tqdm(executor.map(
-                LammpsJob, [int(b.split(" ")[0]) for b in datafile.Bonds[:8]],
+                LammpsJob, [int(b.split(" ")[0]) for b in datafile.Bonds[:12]],
                 timeout=None,
                 chunksize=1),
                  desc="Trying Bonds",
-                 total=8,
+                 total=12,
                  position=0)),
                              key=(lambda x: x[1]))
