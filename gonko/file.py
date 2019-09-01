@@ -237,7 +237,7 @@ class ScriptFile:
         lmp = self.library(cmdargs=[
             "-echo", "both",
             "-screen", f"{screen_out}", "-var", "gonko_data_in", f"{data_in}",
-            "-var", "gonko_data_out", f"{data_out}"
+            "-var", "gonko_data_out", f"{data_out}", "-log", f"{logfile}"
         ])
         lmp.file(self.filename)
         lmp.close()
