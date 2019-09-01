@@ -2,6 +2,7 @@ import gonko
 from lammps import lammps
 import os
 import concurrent.futures as cf
+import multiprocessing as mp
 from tqdm import tqdm
 import itertools
 import shutil
@@ -52,17 +53,28 @@ while z >= k:
     minValDir = f"./job/{minBond}/"  # Path to directory of interest
 
     announce("Calculating V of the sample of this iteration.")
-    gonko.file.ScriptFile("gonko/scripts/in.uniaxial",
-                          lammps).run("data.file", "poissonRatioV.t")
-    V = gonko.file.ScriptOuput("poissonRatioV.t").avg(2000, 10000)
+    V = mp.Value('d', 0.0)
+
+    def getV(v):
+        gonko.file.ScriptFile("gonko/scripts/in.uniaxial",
+                              lammps).run(minValDir + "data.file",
+                                          minValDir + "poissonRatioV.t")
+        v.value = gonko.file.ScriptOuput(minValDir + "poissonRatioV.t").avg(
+            int(2e+3), int(10e+3))
+
+    getV_process = mp.Process(target=getV, args=(V, ))
+    getV_process.start()
+
     # Update data file
     shutil.copy(minValDir + "data.file", "./data.file")
+    # Prepares for checkpoint
+    if not os.path.isdir('./checkpoint'):
+        os.mkdir('./checkpoint')
 
+    getV_process.join()
     announce(f"V test is completed")
 
     # Create checkpoint
-    if not os.path.isdir('./checkpoint'):
-        os.mkdir('./checkpoint')
     shutil.copy(minValDir + "data.file",
                 f"./checkpoint/data_v{V.value}_z{z}.file")
     announce("Data saved at ./checkpoint")
