@@ -55,6 +55,9 @@ while z >= k:
     gonko.file.ScriptFile("gonko/scripts/in.uniaxial",
                           lammps).run("data.file", "poissonRatioV.t")
     V = gonko.file.ScriptOuput("poissonRatioV.t").avg(2000, 10000)
+    # Update data file
+    shutil.copy(minValDir + "data.file", "./data.file")
+
     announce(f"V test is completed")
 
     # Create checkpoint
