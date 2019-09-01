@@ -8,7 +8,7 @@ import shutil
 from gonko.utils.output import announce, yell
 
 k = 2.5
-iter_num = itertools.count()  # while loop iteration counter
+iter_num = itertools.count()  # while-loop iteration counter
 
 datafile = gonko.file.DataFile("data.file")
 print(f"natoms: {datafile.natoms}")
@@ -50,12 +50,13 @@ while z >= k:
     yell(f"Bond with lowest GiList: {minBond}(Gi: {minGi}) deleted")
     G0 = minGi  # Update G0
 
-    announce(f"Calculating V of the sample of this iteration.")
+    announce("Calculating V of the sample of this iteration.")
     gonko.file.ScriptFile("gonko/scripts/in.uniaxial",
                           lammps).run("data.file", "poissonRatioV.t")
     V = gonko.file.ScriptOuput("poissonRatioV.t").avg(2000, 10000)
     announce(f"V test is completed")
 
+    # Create checkpoint
     if not os.path.isdir('./checkpoint'):
         os.mkdir('./checkpoint')
     shutil.copy(f"job/{minBond}/data.file",
