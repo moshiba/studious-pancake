@@ -17,8 +17,8 @@ yell(f"{datafile.nbonds - (k * datafile.natoms) + 1} bonds to delete")
 
 announce(f"Obtaining G0")
 gonko.file.ScriptFile("gonko/scripts/in.shear",
-                      lammps).run(datafile.filename, "ShearModulusG.t")
-G0 = gonko.file.ScriptOuput("ShearModulusG.t").avg(int(2e+3), int(10e+3))
+                      lammps).run(datafile.filename, "./ShearModulusG.t")
+G0 = gonko.file.ScriptOuput("./ShearModulusG.t").avg(int(2e+3), int(10e+3))
 announce(f"Initial G0 aqqired: {G0}")
 
 z = datafile.nbonds / datafile.natoms
@@ -49,6 +49,7 @@ while z >= k:
 
     yell(f"Bond with lowest GiList: {minBond}(Gi: {minGi}) deleted")
     G0 = minGi  # Update G0
+    minValDir = f"./job/{minBond}/"  # Path to directory of interest
 
     announce("Calculating V of the sample of this iteration.")
     gonko.file.ScriptFile("gonko/scripts/in.uniaxial",
@@ -59,9 +60,9 @@ while z >= k:
     # Create checkpoint
     if not os.path.isdir('./checkpoint'):
         os.mkdir('./checkpoint')
-    shutil.copy(f"job/{minBond}/data.file",
-                f"./checkpoint/data_v{V}_z{z}.file")
-    print("Data saved at ./checkpoint")
+    shutil.copy(minValDir + "data.file",
+                f"./checkpoint/data_v{V.value}_z{z}.file")
+    announce("Data saved at ./checkpoint")
 
     z = datafile.nbonds / datafile.natoms
 
