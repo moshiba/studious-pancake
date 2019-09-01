@@ -2,13 +2,14 @@ import gonko
 from lammps import lammps
 import os
 import concurrent.futures as cf
+import multiprocessing as mp
 from tqdm import tqdm
 import itertools
 import shutil
 from gonko.utils.output import announce, yell
 
 k = 2.5
-iter_num = itertools.count()  # while loop iteration counter
+iter_num = itertools.count()  # while-loop iteration counter
 
 datafile = gonko.file.DataFile("data.file")
 print(f"natoms: {datafile.natoms}")
@@ -17,8 +18,8 @@ yell(f"{datafile.nbonds - (k * datafile.natoms) + 1} bonds to delete")
 
 announce(f"Obtaining G0")
 gonko.file.ScriptFile("gonko/scripts/in.shear",
-                      lammps).run(datafile.filename, "ShearModulusG.t")
-G0 = gonko.file.ScriptOuput("ShearModulusG.t").avg(int(2e+3), int(10e+3))
+                      lammps).run(datafile.filename, "./ShearModulusG.t")
+G0 = gonko.file.ScriptOuput("./ShearModulusG.t").avg(int(2e+3), int(10e+3))
 announce(f"Initial G0 aqqired: {G0}")
 
 z = datafile.nbonds / datafile.natoms
@@ -49,18 +50,34 @@ while z >= k:
 
     yell(f"Bond with lowest GiList: {minBond}(Gi: {minGi}) deleted")
     G0 = minGi  # Update G0
+    minValDir = f"./job/{minBond}/"  # Path to directory of interest
 
-    announce(f"Calculating V of the sample of this iteration.")
-    gonko.file.ScriptFile("gonko/scripts/in.uniaxial",
-                          lammps).run("data.file", "poissonRatioV.t")
-    V = gonko.file.ScriptOuput("poissonRatioV.t").avg(2000, 10000)
-    announce(f"V test is completed")
+    announce("Calculating V of the sample of this iteration.")
+    V = mp.Value('d', 0.0)
 
+    def getV(v):
+        gonko.file.ScriptFile("gonko/scripts/in.uniaxial",
+                              lammps).run(minValDir + "data.file",
+                                          minValDir + "poissonRatioV.t")
+        v.value = gonko.file.ScriptOuput(minValDir + "poissonRatioV.t").avg(
+            int(2e+3), int(10e+3))
+
+    getV_process = mp.Process(target=getV, args=(V, ))
+    getV_process.start()
+
+    # Update data file
+    shutil.copy(minValDir + "data.file", "./data.file")
+    # Prepares for checkpoint
     if not os.path.isdir('./checkpoint'):
         os.mkdir('./checkpoint')
-    shutil.copy(f"job/{minBond}/data.file",
-                f"./checkpoint/data_v{V}_z{z}.file")
-    print("Data saved at ./checkpoint")
+
+    getV_process.join()
+    announce(f"V test is completed")
+
+    # Create checkpoint
+    shutil.copy(minValDir + "data.file",
+                f"./checkpoint/data_v{V.value}_z{z}.file")
+    announce("Data saved at ./checkpoint")
 
     z = datafile.nbonds / datafile.natoms
 
