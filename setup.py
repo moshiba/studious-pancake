@@ -33,7 +33,7 @@ setuptools.setup(
     long_description_content_type="text/markdown",
     url="https://github.com/HsuanTingLu/studious-pancake",
     packages=setuptools.find_packages(),
-    install_requires=["tqdm"],
+    install_requires=["tqdm", "psutil"],
     classifiers=[
         "Programming Language :: Python :: 3.7",
         "Development Status :: 1 - Planning", "Environment :: Console",

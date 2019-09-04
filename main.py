@@ -3,6 +3,7 @@ from lammps import lammps
 import os
 import concurrent.futures as cf
 from tqdm import tqdm
+import psutil
 import itertools
 import shutil
 from gonko.utils.output import announce, yell
