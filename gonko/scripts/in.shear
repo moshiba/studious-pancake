@@ -7,13 +7,13 @@ atom_style	molecular
 boundary        p p p
 neighbor        1.2   bin
 neigh_modify    every 1 delay 0 check yes
-pair_style soft      1.0
+pair_style zero      1.0
 bond_style harmonic
 angle_style harmonic
 
 read_data data.file
 
-#Selecting boundaries
+#==================Selecting boundaries==============
 region  left block -10.01 -9.0908 INF INF INF INF
 region  right  block 9.026 10.01 INF INF INF INF
 region  up  block INF INF 9.01 10.01 INF INF
@@ -24,7 +24,6 @@ group right region right
 group up region up
 group down region down
 
-############
 compute rinix right property/atom x
 compute ave_rinix right reduce ave c_rinix
 fix rinix right ave/time 1 100 100 c_ave_rinix mode scalar ave running 
@@ -42,7 +41,7 @@ compute ave_diniy down reduce ave c_diniy
 fix diniy down ave/time 1 100 100 c_ave_diniy mode scalar ave running 
 
 run 100
-############
+#============== Extract Parameters ==================
 # Store final cell length for strain calculations
 variable tmpy equal "(f_uiniy - f_diniy)"
 variable tmpx equal "(f_rinix - f_linix)"                          
@@ -53,9 +52,9 @@ print "Initial Length, L0x: ${L0x}"
 
 
 #reset_timestep	0
-
+#================ Deformation =================
                                                              
-fix		1 all npt temp 1.0 1.0 1 x 1 1 1  flip no 
+#fix	 1 all npt temp 1.0 1.0 1 x 1 1 1  flip no 
 variable srate equal 2.0e10                                         
 variable srate1 equal "v_srate / 1.0e13"   
 fix		3 all deform 1 xy erate ${srate1} units box remap x
@@ -65,27 +64,32 @@ compute leftd left displace/atom
 compute ave_leftd left reduce ave c_leftd[1]
 compute rightd right displace/atom
 compute ave_rightd right reduce ave c_rightd[1]
+
+#================ Calculations =========================
 # for units metal, pressure is in [bars] = 100 [kPa] = 1/10000 [GPa]
 # p2, p3, p4 are in GPa                                             
 variable shearStrain equal "(((c_ave_rightd + c_ave_leftd)/2)/v_L0y)+1e-10"  
 variable shearStress equal "-pxy/10000"   
 variable ShearModulusG equal "v_shearStress/v_shearStrain"                                                                            
  
+#===================Saving Data=========================
 fix savestress all ave/time 1 100 100 v_ShearModulusG  v_shearStrain  v_shearStress  file ShearModulusG.t
 
 #save stress not work
 
 #shell mkdir ./dataset
-#shell mkdir ./dump
+shell mkdir ./sheardump
 
-#dump a all custom 1000 dump/dump.* id type x y z
-#dump_modify a element C
+dump a all custom 1000 sheardump/dump.* id type x y z
+dump_modify a element C
 #write_data  dataset/data.*
 
 
 
-thermo 	100                                                      
-thermo_style	custom step v_ShearModulusG v_shearStrain  v_shearStress  ke pe press
+#thermo 	100                                                      
+#thermo_style	custom step v_ShearModulusG v_shearStrain  v_shearStress  ke pe press
 
                              
 run    200000
+
+print "Done with uniaxial test."
