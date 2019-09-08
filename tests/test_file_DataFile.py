@@ -200,6 +200,15 @@ class TestProperties:
         for i in range(3):
             assert df.groups[8][i] == f"{2*(i+27)}\n"
 
+    def test_AngleCoeffs_harmonic(self, df_factory):
+        df = df_factory("properties")
+        assert df.groups[10] == ["g11\n"]
+        assert df.AngleCoeffs_harmonic == ["g11\n"]
+
+        df.AngleCoeffs_harmonic = ["54\n", "56\n", "58\n"]
+        for i in range(3):
+            assert df.groups[10][i] == f"{2*(i+27)}\n"
+
     def test_Atoms_molecular(self, df_factory):
         df = df_factory("properties")
         assert df.groups[12] == ["g13\n"]
