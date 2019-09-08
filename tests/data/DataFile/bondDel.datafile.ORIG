@@ -4,6 +4,8 @@ g1
 1 atom types
 20 bonds
 1 bond types
+0 angles
+2273 angle types
 
 g3
 
@@ -27,6 +29,10 @@ g12
 
 g13
 
+g14
+
+g15
+
 Bonds
 
 1 1 1 489
@@ -49,3 +55,7 @@ Bonds
 18 1 4 392
 19 1 5 277
 20 1 5 297
+
+g18
+
+g19
