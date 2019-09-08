@@ -74,15 +74,17 @@ class DataFile:
             raise self.BondAlreadyExistsError(f"bond: {bond}")
             # Exits function
 
+        # HACK:
         # to avoid a premature _update() call that resets unwritten changes
         old_nbonds = self.nbonds
         self.Bonds.append(bond)
-        # use self.groups[14] instead of self.Bonds
+        # HACK:
+        # use self.groups[16] instead of self.Bonds
         #   to avoid implicit __update() calls
-        assert bond in self.groups[14]
-        print(f"Bonds Group size: {len(self.groups[14])}")
-        print(f"target bond index: {self.groups[14].index(bond)}")
-        self.groups[14].sort(key=(lambda x: int(x.split(' ')[0])))
+        assert bond in self.groups[16]
+        # print(f"Bonds Group size: {len(self.groups[16])}")
+        # print(f"target bond index: {self.groups[16].index(bond)}")
+        self.groups[16].sort(key=(lambda x: int(x.split(' ')[0])))
         self.set_nbonds(old_nbonds + 1)
 
         self.__writeback()

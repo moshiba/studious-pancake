@@ -26,7 +26,7 @@ def df_factory():
 class TestBasicOperations:
     def test_update_grouping(self, df_factory):
         df = df_factory("grouping")
-        assert len(df.groups) == 15
+        assert len(df.groups) == 18
         for i in range(15):
             assert len(df.groups[i]) == 1
             assert df.groups[i][0] == 'g' + str(i + 1) + '\n'
@@ -126,31 +126,30 @@ class TestProperties:
 
     def test_Atoms_molecular(self, df_factory):
         df = df_factory("properties")
-        df.Atoms_molecular
-        assert df.groups[10] == ["g11\n"]
-        assert df.Atoms_molecular == ["g11\n"]
+        assert df.groups[12] == ["g13\n"]
+        assert df.Atoms_molecular == ["g13\n"]
 
         df.Atoms_molecular = ["54\n", "56\n", "58\n"]
         for i in range(3):
-            assert df.groups[10][i] == f"{2*(i+27)}\n"
+            assert df.groups[12][i] == f"{2*(i+27)}\n"
 
     def test_Velocities(self, df_factory):
         df = df_factory("properties")
-        assert df.groups[12] == ["g13\n"]
-        assert df.Velocities == ["g13\n"]
+        assert df.groups[14] == ["g15\n"]
+        assert df.Velocities == ["g15\n"]
 
         df.Velocities = ["54\n", "56\n", "58\n"]
         for i in range(3):
-            assert df.groups[12][i] == f"{2*(i+27)}\n"
+            assert df.groups[14][i] == f"{2*(i+27)}\n"
 
     def test_Bonds(self, df_factory):
         df = df_factory("properties")
-        assert df.groups[14] == ["g15\n"]
-        assert df.Bonds == ["g15\n"]
+        assert df.groups[16] == ["g17\n"]
+        assert df.Bonds == ["g17\n"]
 
         df.Bonds = ["54\n", "56\n", "58\n"]
         for i in range(3):
-            assert df.groups[14][i] == f"{2*(i+27)}\n"
+            assert df.groups[16][i] == f"{2*(i+27)}\n"
 
 
 class TestBondOperations:
@@ -205,7 +204,7 @@ class TestBondOperations:
         assert df.nbonds == 18
 
         f = DataFile(df.filename)
-        assert "2 1 1 481\n" in f.groups[14]
+        assert "2 1 1 481\n" in f.groups[16]
         assert f.nbonds == 18
 
     def test_addBond_fail(self, df_factory):
