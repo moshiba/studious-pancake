@@ -26,7 +26,7 @@ def df_factory():
 class TestBasicOperations:
     def test_update_grouping(self, df_factory):
         df = df_factory("grouping")
-        assert len(df.groups) == 18
+        assert len(df.groups) == 19
         for i in range(15):
             assert len(df.groups[i]) == 1
             assert df.groups[i][0] == 'g' + str(i + 1) + '\n'
