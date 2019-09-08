@@ -202,15 +202,27 @@ class DataFile:
         self.__writeback()
 
     @property
-    def Atoms_molecular(self):
+    def AngleCoeffs_harmonic(self):
         """
         """
         self.__update()
         return self.groups[10]
 
+    @AngleCoeffs_harmonic.setter
+    def AngleCoeffs_harmonic(self, update: list):
+        self.groups[10] = update
+        self.__writeback()
+
+    @property
+    def Atoms_molecular(self):
+        """
+        """
+        self.__update()
+        return self.groups[12]
+
     @Atoms_molecular.setter
     def Atoms_molecular(self, update: list):
-        self.groups[10] = update
+        self.groups[12] = update
         self.__writeback()
 
     @property
@@ -218,11 +230,11 @@ class DataFile:
         """
         """
         self.__update()
-        return self.groups[12]
+        return self.groups[14]
 
     @Velocities.setter
     def Velocities(self, update: list):
-        self.groups[12] = update
+        self.groups[14] = update
         self.__writeback()
 
     @property
@@ -230,11 +242,23 @@ class DataFile:
         """
         """
         self.__update()
-        return self.groups[14]
+        return self.groups[16]
 
     @Bonds.setter
     def Bonds(self, update: list):
-        self.groups[14] = update
+        self.groups[16] = update
+        self.__writeback()
+
+    @property
+    def Angles(self):
+        """
+        """
+        self.__update()
+        return self.groups[18]
+
+    @Angles.setter
+    def Angles(self, update: list):
+        self.groups[18] = update
         self.__writeback()
 
     class NotFoundError(Exception):
