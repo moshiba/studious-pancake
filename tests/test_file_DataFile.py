@@ -116,6 +116,25 @@ class TestProperties:
         df.set_nbonds(99)
         assert df.groups[1][2] == "99 bonds\n"
 
+    def test_n_bond_types(self, df_factory):
+        df = df_factory("properties")
+        assert df.n_bond_types == 1372
+
+        # without writeback
+        df.groups[1][3] = "246 bond types\n"
+        assert df.n_bond_types == 1372
+        # alternation overwritten when property 'n_bond_types' updated the object
+
+        df.groups[1][3] = "246 bond types\n"
+        df._DataFile__writeback()
+        assert df.n_bond_types == 246
+
+    def test_set_n_bond_types(self, df_factory):
+        df = df_factory("properties")
+        assert df.n_bond_types == 1372
+        df.set_n_bond_types(99)
+        assert df.groups[1][3] == "99 bond types\n"
+
     def test_Masses(self, df_factory):
         df = df_factory("properties")
         assert df.groups[4] == ["g5\n"]
