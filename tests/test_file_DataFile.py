@@ -135,6 +135,25 @@ class TestProperties:
         df.set_n_bond_types(99)
         assert df.groups[1][3] == "99 bond types\n"
 
+    def test_nangles(self, df_factory):
+        df = df_factory("properties")
+        assert df.nangles == 2273
+
+        # without writeback
+        df.groups[1][4] = "246 angles\n"
+        assert df.nangles == 2273
+        # alternation overwritten when property 'nangles' updated the object
+
+        df.groups[1][4] = "246 angles\n"
+        df._DataFile__writeback()
+        assert df.nangles == 246
+
+    def test_set_nangles(self, df_factory):
+        df = df_factory("properties")
+        assert df.nangles == 2273
+        df.set_nangles(99)
+        assert df.groups[1][4] == "99 angles\n"
+
     def test_Masses(self, df_factory):
         df = df_factory("properties")
         assert df.groups[4] == ["g5\n"]
