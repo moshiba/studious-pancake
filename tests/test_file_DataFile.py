@@ -236,6 +236,15 @@ class TestProperties:
         for i in range(3):
             assert df.groups[16][i] == f"{2*(i+27)}\n"
 
+    def test_Angles(self, df_factory):
+        df = df_factory("properties")
+        assert df.groups[18] == ["g19\n"]
+        assert df.Angles == ["g19\n"]
+
+        df.Angles = ["54\n", "56\n", "58\n"]
+        for i in range(3):
+            assert df.groups[18][i] == f"{2*(i+27)}\n"
+
 
 class TestBondOperations:
     def test_deleteBond_succeed(self, df_factory):
