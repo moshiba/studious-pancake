@@ -80,11 +80,11 @@ class TestProperties:
 
     def test_nbonds(self, df_factory):
         df = df_factory("properties")
-        assert df.nbonds == 1356
+        assert df.nbonds == 1372
 
         # without writeback
         df.groups[1][2] = "246 bonds\n"
-        assert df.nbonds == 1356
+        assert df.nbonds == 1372
         # alternation overwritten when property 'nbonds' updated the object
 
         df.groups[1][2] = "246 bonds\n"
@@ -93,7 +93,7 @@ class TestProperties:
 
     def test_set_nbonds(self, df_factory):
         df = df_factory("properties")
-        assert df.nbonds == 1356
+        assert df.nbonds == 1372
         df.set_nbonds(99)
         assert df.groups[1][2] == "99 bonds\n"
 
