@@ -18,6 +18,128 @@
 
 """
 import itertools
+import abc
+import collections
+import collections.abc
+
+
+class _SectionType(collections.abc.MutableMapping):
+    """ represents a section in the datafile """
+    parser_result = collections.namedtuple("parser_result", ["key", "value"])
+    __sections = set()
+
+    @classmethod
+    def _addSubClass(cls, subclass):
+        if subclass not in cls.__sections:
+            cls.__sections.add(subclass.__name__)
+
+    @classmethod
+    def sections(cls):
+        """ returns a set of types of sections created """
+        return cls.__sections
+
+    @staticmethod
+    @abc.abstractmethod
+    def split(entry: str):
+        pass
+
+    @staticmethod
+    @abc.abstractmethod
+    def join(key, value) -> str:
+        pass
+
+    @abc.abstractmethod
+    def __init__(self):
+        super().__init__()
+        self.__class__._addSubClass(self.__class__)
+        self.entries = dict()
+
+    def __getitem__(self, key):
+        return self.entries[key]
+
+    def __setitem__(self, key, value):
+        self.entries[key] = value
+
+    def __delitem__(self, key):
+        del self.entries[key]
+
+    def __iter__(self):
+        return iter(self.entries.keys())
+
+    def __len__(self) -> int:
+        return len(self.entries)
+
+    def __contains__(self, entry):
+        key, value = self.split(entry)
+        return (key, value) in self.entries.items()
+
+    def keys(self):
+        return self.entries.keys()
+
+    def items(self):
+        return self.entries.items()
+
+    def values(self):
+        return self.entries.values()
+
+    def get(self, entry, default=None):
+        return self.entries.get(self.split(entry).key, default)
+
+    def pop(self, entry, default=None):
+        return self.entries.pop(self.split(entry).key, default)
+
+    def update(self, other) -> None:
+        self.entries.update([(self.split(i).key, self.split(i).value)
+                             for i in other])
+
+
+class MassesSection(_SectionType):
+    def __init__(Self):
+        super().__init__()
+
+
+class PairCoeffsSection(_SectionType):
+    def __init__(Self):
+        super().__init__()
+
+
+class BondCoeffsSection(_SectionType):
+    def __init__(Self):
+        super().__init__()
+
+
+class AngleCoeffsSection(_SectionType):
+    def __init__(Self):
+        super().__init__()
+
+
+class AtomsSection(_SectionType):
+    def __init__(Self):
+        super().__init__()
+
+
+class VelocitiesSection(_SectionType):
+    def __init__(Self):
+        super().__init__()
+
+
+class BondsSection(_SectionType):
+    @staticmethod
+    def split(entry: str) -> _SectionType.parser_result:
+        items = entry.rstrip('\n').split(' ')
+        return _SectionType.parser_result(items[0], items[1:])
+
+    @staticmethod
+    def join(key, value) -> str:
+        return ' '.join((key, *value))
+
+    def __init__(self):
+        super().__init__()
+
+
+class AnglesSection(_SectionType):
+    def __init__(Self):
+        super().__init__()
 
 
 class DataFile:
