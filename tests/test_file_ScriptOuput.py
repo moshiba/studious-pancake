@@ -1,7 +1,7 @@
 import os
 import shutil
 import pytest
-from gonko.file import ScriptOuput
+from gonko.file.ScriptOuput import ScriptOuput
 
 
 @pytest.fixture(scope="function")

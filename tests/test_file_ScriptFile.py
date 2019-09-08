@@ -1,7 +1,7 @@
 import os
 import shutil
 import pytest
-from gonko.file import ScriptFile
+from gonko.file.ScriptFile import ScriptFile
 from .mocks.lammps import lammps
 
 

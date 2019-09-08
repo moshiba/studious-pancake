@@ -12,15 +12,17 @@ from gonko.utils.output import announce, yell
 k = 2.5
 iter_num = itertools.count()  # while-loop iteration counter
 
-datafile = gonko.file.DataFile("data.file")
+datafile = gonko.file.DataFile.DataFile("data.file")
 print(f"natoms: {datafile.natoms}")
 print(f"nbonds: {datafile.nbonds}")
 yell(f"{datafile.nbonds - (k * datafile.natoms) + 1} bonds to delete")
 
 announce(f"Obtaining G0")
-gonko.file.ScriptFile("gonko/scripts/in.shear",
-                      lammps).run(datafile.filename, "./ShearModulusG.t")
-G0 = gonko.file.ScriptOuput("./ShearModulusG.t").avg(int(2e+3), int(10e+3))
+gonko.file.ScriptFile.ScriptFile("gonko/scripts/in.shear",
+                                 lammps).run(datafile.filename,
+                                             "./ShearModulusG.t")
+G0 = gonko.file.ScriptOuput.ScriptOuput("./ShearModulusG.t").avg(
+    int(2e+3), int(10e+3))
 announce(f"Initial G0 aqqired: {G0}")
 
 z = datafile.nbonds / datafile.natoms
@@ -57,11 +59,13 @@ while z >= k:
     V = mp.Value('d', 0.0)
 
     def getV(v):
-        gonko.file.ScriptFile("gonko/scripts/in.uniaxial",
-                              lammps).run(minValDir + "data.file",
-                                          minValDir + "poissonRatioV.t")
-        v.value = gonko.file.ScriptOuput(minValDir + "poissonRatioV.t").avg(
-            int(2e+3), int(10e+3))
+        gonko.file.ScriptFile.ScriptFile("gonko/scripts/in.uniaxial",
+                                         lammps).run(
+                                             minValDir + "data.file",
+                                             minValDir + "poissonRatioV.t")
+        v.value = gonko.file.ScriptOuput.ScriptOuput(minValDir +
+                                                     "poissonRatioV.t").avg(
+                                                         int(2e+3), int(10e+3))
 
     getV_process = mp.Process(target=getV, args=(V, ))
     getV_process.start()
