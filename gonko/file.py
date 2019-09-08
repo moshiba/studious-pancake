@@ -106,6 +106,18 @@ class DataFile:
         self.__writeback()
 
     @property
+    def n_atom_types(self):
+        # @todo rename this for better clarity
+        """ returns the number of atom types as integer
+        """
+        self.__update()
+        return int(self.groups[1][1].split(' ')[0])
+
+    def set_n_atom_types(self, num: int):
+        self.groups[1][1] = str(num) + " atom types\n"
+        self.__writeback()
+
+    @property
     def nbonds(self):
         # @todo rename this for better clarity
         """ returns the number of bonds as integer
@@ -115,6 +127,42 @@ class DataFile:
 
     def set_nbonds(self, num: int):
         self.groups[1][2] = str(num) + " bonds\n"
+        self.__writeback()
+
+    @property
+    def n_bond_types(self):
+        # @todo rename this for better clarity
+        """ returns the number of bond types as integer
+        """
+        self.__update()
+        return int(self.groups[1][3].split(' ')[0])
+
+    def set_n_bond_types(self, num: int):
+        self.groups[1][3] = str(num) + " bond types\n"
+        self.__writeback()
+
+    @property
+    def nangles(self):
+        # @todo rename this for better clarity
+        """ returns the number of angles as integer
+        """
+        self.__update()
+        return int(self.groups[1][4].split(' ')[0])
+
+    def set_nangles(self, num: int):
+        self.groups[1][4] = str(num) + " angles\n"
+        self.__writeback()
+
+    @property
+    def n_angle_types(self):
+        # @todo rename this for better clarity
+        """ returns the number of angle types as integer
+        """
+        self.__update()
+        return int(self.groups[1][5].split(' ')[0])
+
+    def set_n_angle_types(self, num: int):
+        self.groups[1][5] = str(num) + " angle types\n"
         self.__writeback()
 
     @property
