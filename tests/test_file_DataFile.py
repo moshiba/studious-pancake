@@ -78,6 +78,25 @@ class TestProperties:
         df.set_natoms(10)
         assert df.groups[1][0] == "10 atoms\n"
 
+    def test_n_atom_types(self, df_factory):
+        df = df_factory("properties")
+        assert df.n_atom_types == 1
+
+        # without writeback
+        df.groups[1][1] = "246 atom types\n"
+        assert df.n_atom_types == 1
+        # alternation overwritten when property 'n_atom_types' updated the object
+
+        df.groups[1][1] = "246 atom types\n"
+        df._DataFile__writeback()
+        assert df.n_atom_types == 246
+
+    def test_set_n_atom_types(self, df_factory):
+        df = df_factory("properties")
+        assert df.n_atom_types == 1
+        df.set_n_atom_types(10)
+        assert df.groups[1][1] == "10 atom types\n"
+
     def test_nbonds(self, df_factory):
         df = df_factory("properties")
         assert df.nbonds == 1372
