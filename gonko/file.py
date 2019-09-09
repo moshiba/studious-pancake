@@ -84,6 +84,10 @@ class DataFile:
                     (popped.split(' ')[-2] in x.rstrip('\n').split(' ')[-3:])),
                                       self.Angles))
 
+            self.groups[16].sort(
+                key=(lambda x: int(x.split(' ')[0])))  # sort bonds
+            self.groups[18].sort(
+                key=(lambda x: int(x.split(' ')[0])))  # sort angles
             self.__writeback()
             return popped
 
