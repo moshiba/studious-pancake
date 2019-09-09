@@ -85,36 +85,6 @@ class DataFile:
         """
         raise NotImplementedError
 
-    def addBond(self, bond: str):
-        """
-        """
-        try:
-            assert bond not in self.Bonds
-        except AssertionError:
-            raise self.BondAlreadyExistsError(f"bond: {bond}")
-            # Exits function
-        else:
-            # HACK:
-            # to avoid a premature _update() call that resets unwritten changes
-            old_nbonds = self.nbonds
-            old_n_bond_types = self.n_bond_types
-            self.Bonds.append(bond)
-            # HACK:
-            # use self.groups[14] instead of self.Bonds
-            #   to avoid implicit __update() calls
-            assert bond in self.groups[16]
-            # print(f"Bonds Group size: {len(self.groups[16])}")
-            # print(f"target bond index: {self.groups[16].index(bond)}")
-            self.groups[16].sort(key=(lambda x: int(x.split(' ')[0])))
-            self.set_nbonds(old_nbonds + 1)
-            self.set_n_bond_types(old_n_bond_types + 1)
-
-    def addAtom(self, atom: str):
-        # @todo expect class to generalize someday
-        """
-        """
-        raise NotImplementedError
-
     @property
     def natoms(self):
         # @todo rename this for better clarity
