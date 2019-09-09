@@ -76,6 +76,14 @@ class DataFile:
             self.set_nbonds(old_nbonds - 1)
             self.set_n_bond_types(old_n_bond_types - 1)
 
+            # Delete `angle` entries accordingly
+            self.Angles = list(
+                itertools.filterfalse((
+                    lambda x: (popped.rstrip('\n').split(' ')[-1] in x.rstrip(
+                        '\n').split(' ')[-3:]) and
+                    (popped.split(' ')[-2] in x.rstrip('\n').split(' ')[-3:])),
+                                      self.Angles))
+
             self.__writeback()
             return popped
 
