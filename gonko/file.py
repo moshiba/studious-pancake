@@ -69,8 +69,12 @@ class DataFile:
         else:
             # to avoid a premature _update() call that resets unwritten changes
             old_nbonds = self.nbonds
+            old_n_bond_types = self.n_bond_types
+
             popped = self.Bonds.pop(idx)
+
             self.set_nbonds(old_nbonds - 1)
+            self.set_n_bond_types(old_n_bond_types - 1)
 
             self.__writeback()
             return popped
@@ -93,6 +97,7 @@ class DataFile:
             # HACK:
             # to avoid a premature _update() call that resets unwritten changes
             old_nbonds = self.nbonds
+            old_n_bond_types = self.n_bond_types
             self.Bonds.append(bond)
             # HACK:
             # use self.groups[14] instead of self.Bonds
@@ -102,6 +107,7 @@ class DataFile:
             # print(f"target bond index: {self.groups[16].index(bond)}")
             self.groups[16].sort(key=(lambda x: int(x.split(' ')[0])))
             self.set_nbonds(old_nbonds + 1)
+            self.set_n_bond_types(old_n_bond_types + 1)
 
     def addAtom(self, atom: str):
         # @todo expect class to generalize someday
