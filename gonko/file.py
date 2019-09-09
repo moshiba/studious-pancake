@@ -69,42 +69,31 @@ class DataFile:
         else:
             # to avoid a premature _update() call that resets unwritten changes
             old_nbonds = self.nbonds
-            popped = self.Bonds.pop(idx)
-            self.set_nbonds(old_nbonds - 1)
+            old_n_bond_types = self.n_bond_types
 
+            popped = self.Bonds.pop(idx)
+
+            self.set_nbonds(old_nbonds - 1)
+            self.set_n_bond_types(old_n_bond_types - 1)
+
+            # Delete `angle` entries accordingly
+            self.Angles = list(
+                itertools.filterfalse((
+                    lambda x: (popped.rstrip('\n').split(' ')[-1] in x.rstrip(
+                        '\n').split(' ')[-3:]) and
+                    (popped.split(' ')[-2] in x.rstrip('\n').split(' ')[-3:])),
+                                      self.Angles))
+
+            self.groups[16].sort(
+                key=(lambda x: int(x.split(' ')[0])))  # sort bonds
+            self.groups[18].sort(
+                key=(lambda x: int(x.split(' ')[0])))  # sort angles
             self.__writeback()
             return popped
 
     def deleteAtom(self, atom_id: int) -> str:
         # @todo expect class to generalize someday
-        """
-        """
-        raise NotImplementedError
-
-    def addBond(self, bond: str):
-        """
-        """
-        try:
-            assert bond not in self.Bonds
-        except AssertionError:
-            raise self.BondAlreadyExistsError(f"bond: {bond}")
-            # Exits function
-        else:
-            # to avoid a premature _update() call that resets unwritten changes
-            old_nbonds = self.nbonds
-            self.Bonds.append(bond)
-            # use self.groups[14] instead of self.Bonds
-            #   to avoid implicit __update() calls
-            assert bond in self.groups[14]
-            print(f"Bonds Group size: {len(self.groups[14])}")
-            print(f"target bond index: {self.groups[14].index(bond)}")
-            self.groups[14].sort(key=(lambda x: int(x.split(' ')[0])))
-            self.set_nbonds(old_nbonds + 1)
-
-            self.__writeback()
-
-    def addAtom(self, atom: str):
-        # @todo expect class to generalize someday
+        # @body WIP in branch `feature/Kale-refactor`
         """
         """
         raise NotImplementedError
@@ -122,6 +111,18 @@ class DataFile:
         self.__writeback()
 
     @property
+    def n_atom_types(self):
+        # @todo rename this for better clarity
+        """ returns the number of atom types as integer
+        """
+        self.__update()
+        return int(self.groups[1][1].split(' ')[0])
+
+    def set_n_atom_types(self, num: int):
+        self.groups[1][1] = str(num) + " atom types\n"
+        self.__writeback()
+
+    @property
     def nbonds(self):
         # @todo rename this for better clarity
         """ returns the number of bonds as integer
@@ -131,6 +132,42 @@ class DataFile:
 
     def set_nbonds(self, num: int):
         self.groups[1][2] = str(num) + " bonds\n"
+        self.__writeback()
+
+    @property
+    def n_bond_types(self):
+        # @todo rename this for better clarity
+        """ returns the number of bond types as integer
+        """
+        self.__update()
+        return int(self.groups[1][3].split(' ')[0])
+
+    def set_n_bond_types(self, num: int):
+        self.groups[1][3] = str(num) + " bond types\n"
+        self.__writeback()
+
+    @property
+    def nangles(self):
+        # @todo rename this for better clarity
+        """ returns the number of angles as integer
+        """
+        self.__update()
+        return int(self.groups[1][4].split(' ')[0])
+
+    def set_nangles(self, num: int):
+        self.groups[1][4] = str(num) + " angles\n"
+        self.__writeback()
+
+    @property
+    def n_angle_types(self):
+        # @todo rename this for better clarity
+        """ returns the number of angle types as integer
+        """
+        self.__update()
+        return int(self.groups[1][5].split(' ')[0])
+
+    def set_n_angle_types(self, num: int):
+        self.groups[1][5] = str(num) + " angle types\n"
         self.__writeback()
 
     @property
@@ -170,15 +207,27 @@ class DataFile:
         self.__writeback()
 
     @property
-    def Atoms_molecular(self):
+    def AngleCoeffs_harmonic(self):
         """
         """
         self.__update()
         return self.groups[10]
 
+    @AngleCoeffs_harmonic.setter
+    def AngleCoeffs_harmonic(self, update: list):
+        self.groups[10] = update
+        self.__writeback()
+
+    @property
+    def Atoms_molecular(self):
+        """
+        """
+        self.__update()
+        return self.groups[12]
+
     @Atoms_molecular.setter
     def Atoms_molecular(self, update: list):
-        self.groups[10] = update
+        self.groups[12] = update
         self.__writeback()
 
     @property
@@ -186,11 +235,11 @@ class DataFile:
         """
         """
         self.__update()
-        return self.groups[12]
+        return self.groups[14]
 
     @Velocities.setter
     def Velocities(self, update: list):
-        self.groups[12] = update
+        self.groups[14] = update
         self.__writeback()
 
     @property
@@ -198,11 +247,23 @@ class DataFile:
         """
         """
         self.__update()
-        return self.groups[14]
+        return self.groups[16]
 
     @Bonds.setter
     def Bonds(self, update: list):
-        self.groups[14] = update
+        self.groups[16] = update
+        self.__writeback()
+
+    @property
+    def Angles(self):
+        """
+        """
+        self.__update()
+        return self.groups[18]
+
+    @Angles.setter
+    def Angles(self, update: list):
+        self.groups[18] = update
         self.__writeback()
 
     class NotFoundError(Exception):
@@ -235,9 +296,9 @@ class ScriptFile:
             screen_out: str = "none",
             logfile: str = "log.lammps"):
         lmp = self.library(cmdargs=[
-            "-echo", "both",
-            "-screen", f"{screen_out}", "-var", "gonko_data_in", f"{data_in}",
-            "-var", "gonko_data_out", f"{data_out}", "-log", f"{logfile}"
+            "-echo", "both", "-screen", f"{screen_out}", "-var",
+            "gonko_data_in", f"{data_in}", "-var", "gonko_data_out",
+            f"{data_out}", "-log", f"{logfile}"
         ])
         lmp.file(self.filename)
         lmp.close()
