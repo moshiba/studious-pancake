@@ -81,6 +81,7 @@ class DataFile:
 
     def deleteAtom(self, atom_id: int) -> str:
         # @todo expect class to generalize someday
+        # @body WIP in branch `feature/Kale-refactor`
         """
         """
         raise NotImplementedError
