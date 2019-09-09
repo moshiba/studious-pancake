@@ -69,42 +69,31 @@ class DataFile:
         else:
             # to avoid a premature _update() call that resets unwritten changes
             old_nbonds = self.nbonds
-            popped = self.Bonds.pop(idx)
-            self.set_nbonds(old_nbonds - 1)
+            old_n_bond_types = self.n_bond_types
 
+            popped = self.Bonds.pop(idx)
+
+            self.set_nbonds(old_nbonds - 1)
+            self.set_n_bond_types(old_n_bond_types - 1)
+
+            # Delete `angle` entries accordingly
+            self.Angles = list(
+                itertools.filterfalse((
+                    lambda x: (popped.rstrip('\n').split(' ')[-1] in x.rstrip(
+                        '\n').split(' ')[-3:]) and
+                    (popped.split(' ')[-2] in x.rstrip('\n').split(' ')[-3:])),
+                                      self.Angles))
+
+            self.groups[16].sort(
+                key=(lambda x: int(x.split(' ')[0])))  # sort bonds
+            self.groups[18].sort(
+                key=(lambda x: int(x.split(' ')[0])))  # sort angles
             self.__writeback()
             return popped
 
     def deleteAtom(self, atom_id: int) -> str:
         # @todo expect class to generalize someday
-        """
-        """
-        raise NotImplementedError
-
-    def addBond(self, bond: str):
-        """
-        """
-        try:
-            assert bond not in self.Bonds
-        except AssertionError:
-            raise self.BondAlreadyExistsError(f"bond: {bond}")
-            # Exits function
-        else:
-            # HACK:
-            # to avoid a premature _update() call that resets unwritten changes
-            old_nbonds = self.nbonds
-            self.Bonds.append(bond)
-            # HACK:
-            # use self.groups[14] instead of self.Bonds
-            #   to avoid implicit __update() calls
-            assert bond in self.groups[16]
-            # print(f"Bonds Group size: {len(self.groups[16])}")
-            # print(f"target bond index: {self.groups[16].index(bond)}")
-            self.groups[16].sort(key=(lambda x: int(x.split(' ')[0])))
-            self.set_nbonds(old_nbonds + 1)
-
-    def addAtom(self, atom: str):
-        # @todo expect class to generalize someday
+        # @body WIP in branch `feature/Kale-refactor`
         """
         """
         raise NotImplementedError

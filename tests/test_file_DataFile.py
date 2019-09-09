@@ -291,36 +291,9 @@ class TestBondOperations:
         f = DataFile(df.filename)
         assert f.nbonds == 20
 
-    def test_addBond_succeed(self, df_factory):
-        df = df_factory("bondAdd")
-        assert df.nbonds == 17
-        df.addBond("2 1 1 481\n")
-        assert df.nbonds == 18
-
-        f = DataFile(df.filename)
-        assert "2 1 1 481\n" in f.groups[16]
-        assert f.nbonds == 18
-
-    def test_addBond_fail(self, df_factory):
-        df = df_factory("bondAdd")
-        assert df.nbonds == 17
-        with pytest.raises(DataFile.BondAlreadyExistsError) as e:
-            df.addBond("1 1 1 489\n")
-
-        assert "bond: 1 1 1 489\n" == str(e.value)
-        assert df.nbonds == 17
-
-        f = DataFile(df.filename)
-        assert f.nbonds == 17
-
 
 class TestAtomOperations:
     def test_deleteAtom(self, df_factory):
         df = df_factory("grouping")
         with pytest.raises(NotImplementedError):
             df.deleteAtom(10)
-
-    def test_recoverAtom(self, df_factory):
-        df = df_factory("grouping")
-        with pytest.raises(NotImplementedError):
-            df.addAtom("not impl")
