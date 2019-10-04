@@ -1,6 +1,6 @@
-# studious-pancake
+# studious-pancake  [![Build Status](https://travis-ci.com/HsuanTingLu/studious-pancake.svg?token=tDHixgpdZAhsXN1fMdDk&branch=master)](https://travis-ci.com/HsuanTingLu/studious-pancake)
 
-[![Build Status](https://travis-ci.com/HsuanTingLu/studious-pancake.svg?token=tDHixgpdZAhsXN1fMdDk&branch=master)](https://travis-ci.com/HsuanTingLu/studious-pancake)
+![python compatibility](https://img.shields.io/badge/python-3.7%20%7C%203.8-blue)
 
 Mysterious structure bond pruning routine wrapper,  
 with parallel task dispatching ability
